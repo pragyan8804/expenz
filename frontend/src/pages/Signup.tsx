@@ -1,5 +1,7 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 import {
   Card,
   CardContent,
@@ -11,9 +13,41 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
+import { signup } from "@/services/api";
+import { Toaster } from "@/components/ui/toaster"
 
 export function Signup() {
   const [showPassword, setShowPassword] = useState(false)
+  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+    try {
+      await signup({ name, username, password });
+      toast({
+        title: "Account created",
+        description: "You've successfully signed up!",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      setError('Signup failed. Please try again.');
+      toast({
+        title: "User already exists",
+        description: "Please try logging in.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -28,11 +62,25 @@ export function Signup() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" type="text" placeholder="name" required />
+            <Input
+              id="name"
+              type="text"
+              placeholder="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input id="username" type="text" placeholder="username" required />
+            <Input
+              id="username"
+              type="text"
+              placeholder="username"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
@@ -42,6 +90,8 @@ export function Signup() {
                 type={showPassword ? "text" : "password"}
                 placeholder="password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <Button
                 type="button"
@@ -61,9 +111,16 @@ export function Signup() {
               </Button>
             </div>
           </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full">Sign Up</Button>
+          <Button 
+            className="w-full" 
+            onClick={handleSubmit} 
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing up..." : "Sign Up"}
+          </Button>
           <p className="text-sm text-center">
             <span className="text-gray-500">Already have an account? </span>
             <a href="/login" className="text-primary hover:underline">
@@ -72,6 +129,7 @@ export function Signup() {
           </p>
         </CardFooter>
       </Card>
+      <Toaster />
     </div>
   )
 }

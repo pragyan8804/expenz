@@ -4,7 +4,8 @@ import { Dashboard } from './pages/Dashboard';
 import { Landing } from './pages/Landing';
 import { Signup } from './pages/Signup';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import TransactionPage from './pages/Transaction';
+// import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -15,10 +16,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           } />
+          <Route path="/transactions" element={<TransactionPage />} />
         </Routes>
       </Router>
     </AuthProvider>

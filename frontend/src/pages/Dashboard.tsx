@@ -1,8 +1,8 @@
 import { Sidebar } from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { AddTransactionModal } from "@/components/Dashboard/AddTransactionModal";
-// import { ExpenseChart } from "@/components/Dashboard/ExpenseChart";
-// import { IncomeChart } from "@/components/Dashboard/IncomeChart";
+import { ExpenseChart } from "@/components/Dashboard/ExpenseChart";
+import { IncomeVsExpenses } from "@/components/Dashboard/IncomeVsExpenses";
 
 export function Dashboard() {
   return (
@@ -29,15 +29,9 @@ export function Dashboard() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <Card className="p-6 bg-white shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Expense Breakdown</h2>
-            {/* <ExpenseChart /> */}
-          </Card>
-          <Card className="p-6 bg-white shadow-sm">
-            <h2 className="text-xl font-bold mb-4">Income vs Expenses</h2>
-            {/* <IncomeChart /> */}
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 justify-center align-center">
+          <ExpenseChart />
+          <IncomeVsExpenses />
         </div>
 
         {/* Add Expense Button */}

@@ -28,7 +28,7 @@ export function AddTransactionModal() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [notes, setNotes] = useState("");
   const [amount, setAmount] = useState("");
-  const [subCategories, setSubCategories] = useState<string[]>([]);
+  const [_subCategories, setSubCategories] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 

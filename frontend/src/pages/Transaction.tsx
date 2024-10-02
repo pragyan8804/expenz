@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -12,22 +12,22 @@ type Transaction = {
   id: string;
   amount: number;
   category: string;
-  subcategory: string;
+  subCategory: string;
   date: string;
   name: string;
   notes: string;
 };
 
 // Mock data for demonstration
-const mockTransactions: Transaction[] = Array.from({ length: 100 }, (_, index) => ({
-  id: `t${index + 1}`,
-  amount: Math.round(Math.random() * 1000 * 100) / 100,
-  category: ['Expense', 'Income', 'Investment'][Math.floor(Math.random() * 3)],
-  subcategory: ['Groceries', 'Salary', 'Stocks', 'Rent', 'Dividends'][Math.floor(Math.random() * 5)],
-  date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-  name: ['Walmart', 'Amazon', 'Paycheck', 'Vanguard', 'Apartment'][Math.floor(Math.random() * 5)],
-  notes: ['Monthly transaction', 'Routine purchase', 'Quarterly dividend', 'Unexpected expense', 'Bonus'][Math.floor(Math.random() * 5)],
-}));
+// const mockTransactions: Transaction[] = Array.from({ length: 100 }, (_, index) => ({
+//   id: `t${index + 1}`,
+//   amount: Math.round(Math.random() * 1000 * 100) / 100,
+//   category: ['Expense', 'Income', 'Investment'][Math.floor(Math.random() * 3)],
+//   subcategory: ['Groceries', 'Salary', 'Stocks', 'Rent', 'Dividends'][Math.floor(Math.random() * 5)],
+//   date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+//   name: ['Walmart', 'Amazon', 'Paycheck', 'Vanguard', 'Apartment'][Math.floor(Math.random() * 5)],
+//   notes: ['Monthly transaction', 'Routine purchase', 'Quarterly dividend', 'Unexpected expense', 'Bonus'][Math.floor(Math.random() * 5)],
+// }));
 
 const categories = {
   Expense: {
@@ -103,10 +103,42 @@ interface Filter {
 }
 
 const TransactionPage: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>({ search: '', type: 'All', subcategories: {} });
   const [sortConfig, setSortConfig] = useState({ key: null as keyof Transaction | null, direction: 'none' });
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      setLoading(true);
+      try {
+        // Replace 'YOUR_USER_ID' with the actual user ID (you might get this from authentication context)
+        // const userId = '66f7973e04bd99ec41216af6';
+        const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("No userId found");
+          return;
+        }
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/transactions/${userId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch transactions');
+        }
+        
+        const data = await response.json();
+        setTransactions(data);
+        setError(null);
+      } catch (err) {
+        setError('Error fetching transactions. Please try again later.');
+        console.error('Error fetching transactions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => 
@@ -115,7 +147,7 @@ const TransactionPage: React.FC = () => {
         t.name.toLowerCase().includes(filter.search.toLowerCase()) ||
         t.notes.toLowerCase().includes(filter.search.toLowerCase())) &&
       (Object.keys(filter.subcategories).length === 0 || 
-        (t.subcategory && filter.subcategories[t.subcategory]))
+        (t.subCategory && filter.subcategories[t.subCategory]))
     );
   }, [transactions, filter]);
 
@@ -143,36 +175,41 @@ const TransactionPage: React.FC = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex dark:bg-black dark:text-white">
       <Sidebar />
-      <div className="flex-grow container mx-auto p-4 dark:bg-black dark:text-white h-screen overflow-y-auto">
+      <div className="flex-grow container mx-auto p-4 h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold mb-4">Transactions</h1>
         
-        <Tabs defaultValue="All" onValueChange={(value) => setFilter(prev => ({ ...prev, type: value as Filter['type'] }))}>
-          <TabsList>
-            <TabsTrigger value="All">All</TabsTrigger>
-            <TabsTrigger value="Expense">Expense</TabsTrigger>
-            <TabsTrigger value="Income">Income</TabsTrigger>
-            <TabsTrigger value="Investment">Investment</TabsTrigger>
-          </TabsList>
-          
-          {['All', 'Expense', 'Income', 'Investment'].map(type => (
-            <TabsContent key={type} value={type}>
-              <TransactionTable 
-                transactions={type === 'All' ? sortedTransactions : sortedTransactions.filter(t => t.category === type)}
-                handleSort={handleSort} 
-                handleSubcategoryFilter={handleSubcategoryFilter}
-                filter={filter}
-                setFilter={setFilter}
-                categories={categories}
-                sortConfig={{
-                  ...sortConfig,
-                  direction: sortConfig.direction as "none" | "desc" | "asc"
-                }}
-              />
-            </TabsContent>
-          ))}
-        </Tabs>
+        {loading && <p>Loading transactions...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        
+        {!loading && !error && (
+          <Tabs defaultValue="All" onValueChange={(value) => setFilter(prev => ({ ...prev, type: value as Filter['type'] }))}>
+            <TabsList>
+              <TabsTrigger value="All">All</TabsTrigger>
+              <TabsTrigger value="Expense">Expense</TabsTrigger>
+              <TabsTrigger value="Income">Income</TabsTrigger>
+              <TabsTrigger value="Investment">Investment</TabsTrigger>
+            </TabsList>
+            
+            {['All', 'Expense', 'Income', 'Investment'].map(type => (
+              <TabsContent key={type} value={type}>
+                <TransactionTable 
+                  transactions={type === 'All' ? sortedTransactions : sortedTransactions.filter(t => t.category === type)}
+                  handleSort={handleSort} 
+                  handleSubcategoryFilter={handleSubcategoryFilter}
+                  filter={filter}
+                  setFilter={setFilter}
+                  categories={categories}
+                  sortConfig={{
+                    ...sortConfig,
+                    direction: sortConfig.direction as "none" | "desc" | "asc"
+                  }}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        )}
       </div>
     </div>
   );
@@ -189,7 +226,7 @@ const TransactionTable: React.FC<{
 }> = ({ transactions, handleSort, handleSubcategoryFilter, filter, setFilter, categories, sortConfig }) => {
   const subcategories = useMemo(() => {
     if (filter.type === 'All') {
-      return [...new Set(transactions.map(t => t.subcategory))];
+      return [...new Set(transactions.map(t => t.subCategory))];
     }
     return Object.values(categories[filter.type as keyof typeof categories]).flat();
   }, [transactions, filter.type, categories]);
@@ -258,7 +295,7 @@ const TransactionTable: React.FC<{
             {transactions.map(transaction => (
               <TableRow key={transaction.id} className="border-t border-gray-200 dark:border-gray-700">
                 <TableCell>{transaction.amount}</TableCell>
-                <TableCell>{`${transaction.category} (${transaction.subcategory})`}</TableCell>
+                <TableCell>{transaction.subCategory}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.name}</TableCell>
                 <TableCell>{transaction.notes}</TableCell>

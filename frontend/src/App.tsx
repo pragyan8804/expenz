@@ -8,7 +8,7 @@ import TransactionPage from './pages/Transaction';
 import { Toaster } from "@/components/ui/toaster";
 import Settings from './pages/Settings';
 import { ThemeProvider } from './components/ThemeContext';
-// import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -20,12 +20,20 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <Dashboard />
-              // </ProtectedRoute>
+              </ProtectedRoute>
             } />
-            <Route path="/transactions" element={<TransactionPage />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/transactions" element={
+              <ProtectedRoute>
+                <TransactionPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
           </Routes>
         </Router>
         <Toaster />

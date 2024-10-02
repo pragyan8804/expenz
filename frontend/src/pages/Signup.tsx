@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -9,29 +9,33 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Eye, EyeOff } from "lucide-react"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 import { signup } from "@/services/api";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { useAuth } from "@/context/AuthContext";
 
 export function Signup() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login: loginUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
-      await signup({ name, username, password });
+      const response = await signup({ name, username, password });
+      // Store both userId and token
+      loginUser(response.token, response.userId);
       toast({
         title: "Account created",
         description: "You've successfully signed up!",
@@ -114,9 +118,9 @@ export function Signup() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button 
-            className="w-full" 
-            onClick={handleSubmit} 
+          <Button
+            className="w-full"
+            onClick={handleSubmit}
             disabled={isLoading}
           >
             {isLoading ? "Signing up..." : "Sign Up"}
@@ -131,5 +135,5 @@ export function Signup() {
       </Card>
       <Toaster />
     </div>
-  )
+  );
 }

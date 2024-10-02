@@ -141,6 +141,7 @@ export function AddTransactionModal() {
     const userId = localStorage.getItem("userId");
     if (!userId) {
       console.error("No userId found");
+      showToast("Error", "User ID not found. Please log in again.", "destructive");
       return;
     }
 
@@ -182,7 +183,7 @@ export function AddTransactionModal() {
       <DialogTrigger asChild>
         <Button onClick={() => handleOpenChange(true)}>Add Transaction</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-black text-white">
         <DialogHeader>
           <DialogTitle>Add Transaction</DialogTitle>
           <DialogDescription>

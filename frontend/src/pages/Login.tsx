@@ -33,7 +33,8 @@ export function Login() {
     setIsLoading(true);
     try {
       const response = await login({ username, password });
-      loginUser(response.token);
+      // Store both userId and token
+      loginUser(response.token, response.userId);
       toast({
         title: "Login successful",
         description: "You've successfully logged in!",

@@ -5,6 +5,7 @@ import { Landing } from './pages/Landing';
 import { Signup } from './pages/Signup';
 import { AuthProvider } from './context/AuthContext';
 import TransactionPage from './pages/Transaction';
+import { Toaster } from "@/components/ui/toaster";
 // import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/transactions" element={<TransactionPage />} />
         </Routes>
       </Router>
+      <Toaster />
     </AuthProvider>
   );
 }

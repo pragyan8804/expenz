@@ -1,16 +1,25 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 export function AddTransactionModal() {
   const [name, setName] = useState("");
@@ -20,12 +29,42 @@ export function AddTransactionModal() {
   const [notes, setNotes] = useState("");
   const [amount, setAmount] = useState("");
   const [subCategories, setSubCategories] = useState<string[]>([]);
-  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  const resetForm = () => {
+    setName("");
+    setCategory("");
+    setSubCategory("");
+    setDate(new Date());
+    setNotes("");
+    setAmount("");
+    setSubCategories([]);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (open) {
+      resetForm();
+    }
+  };
+
+  const showToast = (title: string, description: string, variant: "default" | "destructive") => {
+    const { dismiss } = toast({
+      title,
+      description,
+      variant,
+    });
+
+    setTimeout(() => {
+      dismiss();
+    }, 2000);
+  };
 
   // Categories with subcategories and group labels
   const categories = {
     Expense: {
-      "Essentials": [
+      Essentials: [
         "Food & Dining",
         "Groceries",
         "Healthcare",
@@ -37,7 +76,7 @@ export function AddTransactionModal() {
         "Insurance",
         "Debt Payments",
       ],
-      "Lifestyle": [
+      Lifestyle: [
         "Transportation",
         "Entertainment",
         "Shopping",
@@ -46,7 +85,7 @@ export function AddTransactionModal() {
         "Gifts & Donations",
         "Subscriptions",
       ],
-      "Miscellaneous": ["Miscellaneous"],
+      Miscellaneous: ["Miscellaneous"],
     },
     Income: {
       "Primary Income": ["Salary", "Business", "Freelance"],
@@ -90,26 +129,58 @@ export function AddTransactionModal() {
     },
   };
 
-  // Handle category selection
+  // Update subcategories when category changes
   const handleCategoryChange = (value: keyof typeof categories) => {
     setCategory(value);
     setSubCategories(Object.values(categories[value]).flat() || []);
-    setSubCategory(""); // Reset subcategory when category changes
+    setSubCategory("");
   };
 
-  const handleAddTransaction = () => {
-    // Logic to add the transaction will go here
-    console.log({ name, category, subCategory, date, notes, amount });
-  };
+  const handleAddTransaction = async () => {
+    // Get userId from localStorage
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("No userId found");
+      return;
+    }
 
-  const handleCustomCategory = () => {
-    navigate("/custom-category"); // Redirect to the custom category creation page
+    // Prepare the transaction data
+    const transactionData = {
+      userId,
+      name,
+      category,
+      subCategory,
+      date,
+      notes,
+      amount,
+    };
+
+    try {
+      // Send transaction to backend
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/transactions/add`,
+        transactionData
+      );
+
+      console.log("Transaction added successfully:", response.data);
+      
+      // Show success toast
+      showToast("Success", "Transaction added successfully", "default");
+
+      // Close modal on success
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      
+      // Show error toast
+      showToast("Error", "Failed to add transaction. Please try again.", "destructive");
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>Add Transaction</Button>
+        <Button onClick={() => handleOpenChange(true)}>Add Transaction</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -124,10 +195,14 @@ export function AddTransactionModal() {
           {/* Transaction Name */}
           <div>
             <Label htmlFor="name">Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Transaction Name" />
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Transaction Name"
+            />
           </div>
 
-          {/* Category and Subcategory in the same row */}
           <div className="grid grid-cols-2 gap-4">
             {/* Category Dropdown */}
             <div>
@@ -140,7 +215,6 @@ export function AddTransactionModal() {
                   <SelectItem value="Expense">Expense</SelectItem>
                   <SelectItem value="Income">Income</SelectItem>
                   <SelectItem value="Investment">Investment</SelectItem>
-                  <SelectItem value="custom">Add Custom Category</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -148,12 +222,17 @@ export function AddTransactionModal() {
             {/* Subcategory Dropdown */}
             <div>
               <Label htmlFor="subCategory">Subcategory</Label>
-              <Select onValueChange={(value) => setSubCategory(value)} disabled={!category}>
+              <Select
+                onValueChange={(value) => setSubCategory(value)}
+                disabled={!category}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a subcategory" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(categories[category as keyof typeof categories] || {}).map(([groupLabel, subCats]) => (
+                  {Object.entries(
+                    categories[category as keyof typeof categories] || {}
+                  ).map(([groupLabel, subCats]) => (
                     <SelectGroup key={groupLabel}>
                       <SelectLabel className="px-2 pt-3 pb-1 text-xs font-semibold uppercase text-gray-400">
                         {groupLabel}
@@ -170,12 +249,17 @@ export function AddTransactionModal() {
             </div>
           </div>
 
-          {/* Amount and Date in the same row */}
           <div className="grid grid-cols-2 gap-4">
             {/* Amount Input */}
             <div>
               <Label htmlFor="amount">Amount</Label>
-              <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount" />
+              <Input
+                id="amount"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Amount"
+              />
             </div>
 
             {/* Date Input using Calendar */}
@@ -209,7 +293,12 @@ export function AddTransactionModal() {
           {/* Notes Input */}
           <div>
             <Label htmlFor="notes">Notes (Optional)</Label>
-            <Input id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" />
+            <Input
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Notes"
+            />
           </div>
         </div>
 

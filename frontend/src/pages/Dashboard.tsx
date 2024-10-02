@@ -6,7 +6,7 @@ import { IncomeVsExpenses } from "@/components/Dashboard/IncomeVsExpenses";
 
 export function Dashboard() {
   return (
-    <div className="flex bg-white">
+    <div className="flex bg-white dark:bg-black h-screen overflow-y-auto">
       <Sidebar />
 
       <main className="flex-1 p-8">
@@ -23,8 +23,8 @@ export function Dashboard() {
             <p className="text-3xl font-bold mt-2">$5,000.00</p>
           </Card>
           <Card className="p-6 bg-white shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-600">Net Savings</h2>
-            <p className="text-3xl font-bold mt-2 text-green-600">$2,550.00</p>
+            <h2 className="text-lg font-semibold text-gray-600">Total Investments</h2>
+            <p className="text-3xl font-bold mt-2">$2,000.00</p>
           </Card>
         </div>
 

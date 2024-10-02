@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Transaction = {
   id: string;
@@ -103,9 +103,10 @@ interface Filter {
 }
 
 const TransactionPage: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [filter, setFilter] = useState<Filter>({ search: '', type: 'All', subcategories: {} });
-  const [sortConfig, setSortConfig] = useState({ key: null as keyof Transaction | null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null as keyof Transaction | null, direction: 'none' });
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => 
@@ -119,7 +120,7 @@ const TransactionPage: React.FC = () => {
   }, [transactions, filter]);
 
   const sortedTransactions = useMemo(() => {
-    if (sortConfig.key === null) return filteredTransactions;
+    if (sortConfig.key === null || sortConfig.direction === 'none') return filteredTransactions;
     return [...filteredTransactions].sort((a, b) => {
       if (a[sortConfig.key!] < b[sortConfig.key!]) return sortConfig.direction === 'asc' ? -1 : 1;
       if (a[sortConfig.key!] > b[sortConfig.key!]) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -127,16 +128,8 @@ const TransactionPage: React.FC = () => {
     });
   }, [filteredTransactions, sortConfig]);
 
-  const handleSort = (key: keyof Transaction) => {
-    setSortConfig(prevConfig => ({
-      key,
-      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
-    }));
-  };
-
-  const renderSortIcon = (key: keyof Transaction) => {
-    if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? <ChevronUp className="inline" /> : <ChevronDown className="inline" />;
+  const handleSort = (key: keyof Transaction, direction: 'asc' | 'desc' | 'none') => {
+    setSortConfig({ key, direction });
   };
 
   const handleSubcategoryFilter = (subcategory: string) => {
@@ -152,7 +145,7 @@ const TransactionPage: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-grow container mx-auto p-4">
+      <div className="flex-grow container mx-auto p-4 dark:bg-black dark:text-white h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold mb-4">Transactions</h1>
         
         <Tabs defaultValue="All" onValueChange={(value) => setFilter(prev => ({ ...prev, type: value as Filter['type'] }))}>
@@ -168,11 +161,14 @@ const TransactionPage: React.FC = () => {
               <TransactionTable 
                 transactions={type === 'All' ? sortedTransactions : sortedTransactions.filter(t => t.category === type)}
                 handleSort={handleSort} 
-                renderSortIcon={renderSortIcon}
                 handleSubcategoryFilter={handleSubcategoryFilter}
                 filter={filter}
                 setFilter={setFilter}
                 categories={categories}
+                sortConfig={{
+                  ...sortConfig,
+                  direction: sortConfig.direction as "none" | "desc" | "asc"
+                }}
               />
             </TabsContent>
           ))}
@@ -184,19 +180,40 @@ const TransactionPage: React.FC = () => {
 
 const TransactionTable: React.FC<{
   transactions: Transaction[], 
-  handleSort: (key: keyof Transaction) => void,
-  renderSortIcon: (key: keyof Transaction) => React.ReactNode,
+  handleSort: (key: keyof Transaction, direction: 'asc' | 'desc' | 'none') => void,
   handleSubcategoryFilter: (subcategory: string) => void,
   filter: any,
   setFilter: React.Dispatch<React.SetStateAction<any>>,
-  categories: typeof categories
-}> = ({ transactions, handleSort, renderSortIcon, handleSubcategoryFilter, filter, setFilter, categories }) => {
+  categories: typeof categories,
+  sortConfig: { key: keyof Transaction | null, direction: 'asc' | 'desc' | 'none' },
+}> = ({ transactions, handleSort, handleSubcategoryFilter, filter, setFilter, categories, sortConfig }) => {
   const subcategories = useMemo(() => {
     if (filter.type === 'All') {
       return [...new Set(transactions.map(t => t.subcategory))];
     }
     return Object.values(categories[filter.type as keyof typeof categories]).flat();
   }, [transactions, filter.type, categories]);
+
+  const renderSortSelect = (key: keyof Transaction) => {
+    if (key === 'notes' || key === 'name') {
+      return <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>;
+    }
+    return (
+      <Select
+        value={sortConfig.key === key ? sortConfig.direction : 'none'}
+        onValueChange={(value) => handleSort(key, value as 'asc' | 'desc' | 'none')}
+      >
+        <SelectTrigger className="w-[130px]">
+          <SelectValue placeholder={key.charAt(0).toUpperCase() + key.slice(1)} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">{key.charAt(0).toUpperCase() + key.slice(1)}</SelectItem>
+          <SelectItem value="asc">↑ {key.charAt(0).toUpperCase() + key.slice(1)}</SelectItem>
+          <SelectItem value="desc">↓ {key.charAt(0).toUpperCase() + key.slice(1)}</SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  };
 
   return (
     <>
@@ -208,54 +225,48 @@ const TransactionTable: React.FC<{
         />
       </div>
       
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead onClick={() => handleSort('amount')}>
-              Amount {renderSortIcon('amount')}
-            </TableHead>
-            <TableHead>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost">Category (Subcategory) {renderSortIcon('category')}</Button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  {subcategories.map(subcat => (
-                    <div key={subcat}>
-                      <Checkbox 
-                        id={subcat} 
-                        checked={filter.subcategories[subcat]} 
-                        onCheckedChange={() => handleSubcategoryFilter(subcat)}
-                      />
-                      <label htmlFor={subcat}>{subcat}</label>
-                    </div>
-                  ))}
-                </PopoverContent>
-              </Popover>
-            </TableHead>
-            <TableHead onClick={() => handleSort('date')}>
-              Date {renderSortIcon('date')}
-            </TableHead>
-            <TableHead onClick={() => handleSort('name')}>
-              Name {renderSortIcon('name')}
-            </TableHead>
-            <TableHead onClick={() => handleSort('notes')}>
-              Notes {renderSortIcon('notes')}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.map(transaction => (
-            <TableRow key={transaction.id}>
-              <TableCell>{transaction.amount}</TableCell>
-              <TableCell>{`${transaction.category} (${transaction.subcategory})`}</TableCell>
-              <TableCell>{transaction.date}</TableCell>
-              <TableCell>{transaction.name}</TableCell>
-              <TableCell>{transaction.notes}</TableCell>
+      <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow className="bg-gray-50 dark:bg-gray-950">
+              <TableHead>{renderSortSelect('amount')}</TableHead>
+              <TableHead>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost">Category (Subcategory)</Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    {subcategories.map(subcat => (
+                      <div key={subcat}>
+                        <Checkbox 
+                          id={subcat} 
+                          checked={filter.subcategories[subcat]} 
+                          onCheckedChange={() => handleSubcategoryFilter(subcat)}
+                        />
+                        <label htmlFor={subcat}>{subcat}</label>
+                      </div>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </TableHead>
+              <TableHead>{renderSortSelect('date')}</TableHead>
+              <TableHead>{renderSortSelect('name')}</TableHead>
+              <TableHead>{renderSortSelect('notes')}</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {transactions.map(transaction => (
+              <TableRow key={transaction.id} className="border-t border-gray-200 dark:border-gray-700">
+                <TableCell>{transaction.amount}</TableCell>
+                <TableCell>{`${transaction.category} (${transaction.subcategory})`}</TableCell>
+                <TableCell>{transaction.date}</TableCell>
+                <TableCell>{transaction.name}</TableCell>
+                <TableCell>{transaction.notes}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 };

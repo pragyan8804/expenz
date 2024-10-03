@@ -9,7 +9,8 @@ import { useAuth } from '@/context/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 
 export interface User {
-  userId: string;
+  username: string;
+  email: string;
 }
 
 const Settings: React.FC = () => {
@@ -22,11 +23,27 @@ const Settings: React.FC = () => {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        if (decodedToken && decodedToken.userId) {
-          setUser({ userId: decodedToken.userId });
-        } else {
-          console.warn('Username not found in token payload');
-        }
+        const userId = decodedToken.userId;
+
+        // Fetch user details from the backend
+        const fetchUserDetails = async () => {
+          try {
+            const response = await fetch(`http://localhost:5001/api/auth/users/${userId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+            if (!response.ok) {
+              throw new Error('Failed to fetch user details');
+            }
+            const userDetails = await response.json();
+            setUser(userDetails);
+          } catch (error) {
+            console.error('Failed to fetch user details:', error);
+          }
+        };
+
+        fetchUserDetails();
       } catch (error) {
         console.error('Failed to decode token:', error);
       }
@@ -48,7 +65,7 @@ const Settings: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div>
-                <Label>userId: {user.userId}</Label>
+                <Label>Username: {user.username}</Label>
               </div>
             </CardContent>
           </Card>

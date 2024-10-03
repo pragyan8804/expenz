@@ -18,7 +18,7 @@ import {
 export const description = "A donut chart showing expense categories"
 
 const chartData = [
-  { category: "Housing", amount: 1200, fill: "hsl(var(--chart-1))" },
+  { category: "Housing", amount: 600, fill: "hsl(var(--chart-1))" },
   { category: "Food", amount: 400, fill: "hsl(var(--chart-2))" },
   { category: "Transportation", amount: 300, fill: "hsl(var(--chart-3))" },
   { category: "Utilities", amount: 200, fill: "hsl(var(--chart-4))" },

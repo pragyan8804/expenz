@@ -183,7 +183,7 @@ export function AddTransactionModal() {
       <DialogTrigger asChild>
         <Button onClick={() => handleOpenChange(true)}>Add Transaction</Button>
       </DialogTrigger>
-      <DialogContent className="bg-black text-white">
+      <DialogContent className="bg-white text-black dark:bg-black dark:text-white">
         <DialogHeader>
           <DialogTitle>Add Transaction</DialogTitle>
           <DialogDescription>

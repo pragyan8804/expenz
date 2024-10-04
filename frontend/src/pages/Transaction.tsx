@@ -7,9 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Sidebar } from '@/components/Sidebar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import DeleteTransaction from '@/components/Transaction/DeleteTransaction';
 
 type Transaction = {
-  id: string;
+  _id: string;
   amount: number;
   category: string;
   subCategory: string;
@@ -17,17 +18,6 @@ type Transaction = {
   name: string;
   notes: string;
 };
-
-// Mock data for demonstration
-// const mockTransactions: Transaction[] = Array.from({ length: 100 }, (_, index) => ({
-//   id: `t${index + 1}`,
-//   amount: Math.round(Math.random() * 1000 * 100) / 100,
-//   category: ['Expense', 'Income', 'Investment'][Math.floor(Math.random() * 3)],
-//   subcategory: ['Groceries', 'Salary', 'Stocks', 'Rent', 'Dividends'][Math.floor(Math.random() * 5)],
-//   date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-//   name: ['Walmart', 'Amazon', 'Paycheck', 'Vanguard', 'Apartment'][Math.floor(Math.random() * 5)],
-//   notes: ['Monthly transaction', 'Routine purchase', 'Quarterly dividend', 'Unexpected expense', 'Bonus'][Math.floor(Math.random() * 5)],
-// }));
 
 const categories = {
   Expense: {
@@ -113,8 +103,6 @@ const TransactionPage: React.FC = () => {
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        // Replace 'YOUR_USER_ID' with the actual user ID (you might get this from authentication context)
-        // const userId = '66f7973e04bd99ec41216af6';
         const userId = localStorage.getItem("userId");
     if (!userId) {
       console.error("No userId found");
@@ -174,6 +162,8 @@ const TransactionPage: React.FC = () => {
     }));
   };
 
+
+
   return (
     <div className="flex dark:bg-black dark:text-white">
       <Sidebar />
@@ -201,6 +191,7 @@ const TransactionPage: React.FC = () => {
                   filter={filter}
                   setFilter={setFilter}
                   categories={categories}
+                  setTransactions={setTransactions}
                   sortConfig={{
                     ...sortConfig,
                     direction: sortConfig.direction as "none" | "desc" | "asc"
@@ -223,6 +214,7 @@ const TransactionTable: React.FC<{
   setFilter: React.Dispatch<React.SetStateAction<any>>,
   categories: typeof categories,
   sortConfig: { key: keyof Transaction | null, direction: 'asc' | 'desc' | 'none' },
+  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
 }> = ({ transactions, handleSort, handleSubcategoryFilter, filter, setFilter, categories, sortConfig }) => {
   const subcategories = useMemo(() => {
     if (filter.type === 'All') {
@@ -230,6 +222,9 @@ const TransactionTable: React.FC<{
     }
     return Object.values(categories[filter.type as keyof typeof categories]).flat();
   }, [transactions, filter.type, categories]);
+
+  const [_deletedTransaction, setDeletedTransactions] = useState<Transaction[]>([]);
+  
 
   const renderSortSelect = (key: keyof Transaction) => {
     if (key === 'notes' || key === 'name') {
@@ -251,6 +246,13 @@ const TransactionTable: React.FC<{
       </Select>
     );
   };
+
+  const handleDeleteSuccess = (transactionId: string) => {
+ 
+    setDeletedTransactions(transactions.filter(t => t._id !== transactionId)); 
+  };
+  console.log(transactions);
+
 
   return (
     <>
@@ -289,16 +291,20 @@ const TransactionTable: React.FC<{
               <TableHead>{renderSortSelect('date')}</TableHead>
               <TableHead>{renderSortSelect('name')}</TableHead>
               <TableHead>{renderSortSelect('notes')}</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.map(transaction => (
-              <TableRow key={transaction.id} className="border-t border-gray-200 dark:border-gray-700">
+              <TableRow key={transaction._id} className="border-t border-gray-200 dark:border-gray-700">
                 <TableCell>{transaction.amount}</TableCell>
                 <TableCell>{transaction.subCategory}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.name}</TableCell>
                 <TableCell>{transaction.notes}</TableCell>
+                <TableCell>
+                  <DeleteTransaction transactionId={transaction._id} onDeleteSuccess={() => handleDeleteSuccess(transaction._id)} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

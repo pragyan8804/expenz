@@ -7,6 +7,7 @@ import { useTheme } from '@/components/ThemeContext';
 import { Sidebar } from '@/components/Sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 export interface User {
   username: string;
@@ -28,16 +29,12 @@ const Settings: React.FC = () => {
         // Fetch user details from the backend
         const fetchUserDetails = async () => {
           try {
-            const response = await fetch(`http://localhost:5001/api/auth/users/${userId}`, {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users/${userId}`, { 
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
             });
-            if (!response.ok) {
-              throw new Error('Failed to fetch user details');
-            }
-            const userDetails = await response.json();
-            setUser(userDetails);
+            setUser(response.data); // Set user details from response
           } catch (error) {
             console.error('Failed to fetch user details:', error);
           }

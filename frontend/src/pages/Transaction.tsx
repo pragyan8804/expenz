@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sidebar } from '@/components/Sidebar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeleteTransaction from '@/components/Transaction/DeleteTransaction';
+import axios from 'axios';
 
 type Transaction = {
   _id: string;
@@ -104,18 +105,13 @@ const TransactionPage: React.FC = () => {
       setLoading(true);
       try {
         const userId = localStorage.getItem("userId");
-    if (!userId) {
-      console.error("No userId found");
+        if (!userId) {
+          console.error("No userId found");
           return;
         }
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/transactions/${userId}`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/transactions/${userId}`);
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch transactions');
-        }
-        
-        const data = await response.json();
-        setTransactions(data);
+        setTransactions(response.data);
         setError(null);
       } catch (err) {
         setError('Error fetching transactions. Please try again later.');
@@ -248,7 +244,6 @@ const TransactionTable: React.FC<{
   };
 
   const handleDeleteSuccess = (transactionId: string) => {
- 
     setDeletedTransactions(transactions.filter(t => t._id !== transactionId)); 
   };
   console.log(transactions);

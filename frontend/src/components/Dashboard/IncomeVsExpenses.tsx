@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  // CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -23,6 +24,12 @@ const chartData = [
   { month: "April", income: 3800, expenses: 3200 },
   { month: "May", income: 3600, expenses: 3100 },
   { month: "June", income: 4000, expenses: 3500 },
+  { month: "July", income: 4000, expenses: 3500 },
+  { month: "August", income: 4000, expenses: 3500 },
+  { month: "September", income: 4000, expenses: 3500 },
+  { month: "October", income: 4000, expenses: 3500 },
+  { month: "November", income: 4000, expenses: 3500 },
+  { month: "December", income: 4000, expenses: 3500 },
 ]
 
 const chartConfig = {
@@ -41,7 +48,7 @@ export function IncomeVsExpenses() {
     <Card>
       <CardHeader>
         <CardTitle>Income vs Expenses</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>January - December 2024</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

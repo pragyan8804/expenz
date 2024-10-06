@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, ChevronLeft } from "lucide-react";
 import { HomeIcon, ListIcon, SettingsIcon, LogOutIcon, ReceiptText } from "lucide-react"; 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 
 export function Sidebar() {
@@ -57,11 +57,11 @@ export function Sidebar() {
           {!collapsed && <span className="ml-2">Logout</span>}
         </Button>
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-          <DialogOverlay />
+          {/* <DialogOverlay /> */}
           <DialogContent>
-            <DialogTitle>Are you sure you want to log out?</DialogTitle>
+            <DialogTitle className="dark:text-white">Are you sure you want to log out?</DialogTitle>
             <DialogDescription>
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end gap-3 dark:text-white">
                 <Button onClick={() => setDialogOpen(false)}>No</Button>
                 <Link to="/" onClick={handleLogout}>
                   <Button variant="destructive">Log Out</Button>

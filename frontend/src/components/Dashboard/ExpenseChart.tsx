@@ -1,129 +1,126 @@
-import * as React from "react"
-import { Label, Pie, PieChart, Cell } from "recharts"
-
+import * as React from "react";
+import { Label, Pie, PieChart, Cell } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-//   CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import axios from 'axios';
 
-export const description = "A donut chart showing expense categories"
+const fetchExpenseDistribution = async (userId: string) => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BACKEND_URL}/api/transactions/expenses/distribution/${userId}`
+  );
+  return response.data;
+};
 
-const chartData = [
-  { category: "Housing", amount: 600, fill: "hsl(var(--chart-1))" },
-  { category: "Food", amount: 400, fill: "hsl(var(--chart-2))" },
-  { category: "Transportation", amount: 300, fill: "hsl(var(--chart-3))" },
-  { category: "Utilities", amount: 200, fill: "hsl(var(--chart-4))" },
-  { category: "Other", amount: 250, fill: "hsl(var(--chart-5))" },
-]
-
-const chartConfig = {
-  amount: {
-    label: "Amount",
-  },
-  housing: {
-    label: "Housing",
-    color: "hsl(var(--chart-1))",
-  },
-  food: {
-    label: "Food",
-    color: "hsl(var(--chart-2))",
-  },
-  transportation: {
-    label: "Transportation",
-    color: "hsl(var(--chart-3))",
-  },
-  utilities: {
-    label: "Utilities",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig
+// Define the interface for chart data entries
+interface ChartDataEntry {
+    fill: string;
+}
 
 export function ExpenseChart() {
-  const totalExpenses = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.amount, 0)
-  }, [])
+  const [chartData, setChartData] = React.useState<ChartDataEntry[]>([]);
+  const [totalExpenses, setTotalExpenses] = React.useState(0);
+
+  const userId = localStorage.getItem("userId");
+
+  // Fetch expense distribution data when component mounts
+  React.useEffect(() => {
+    async function getExpenseDistribution() {
+      if (!userId) return; // Ensure userId is not null or undefined
+      try {
+        const expenseData = await fetchExpenseDistribution(userId);
+
+        // Map the expense data into the format needed for the chart
+        const mappedData = expenseData.map((item: { _id: any; totalAmount: any; }, index: number) => ({
+          category: item._id,
+          amount: item.totalAmount,
+          fill: `hsl(var(--chart-${index + 1}))`, // Dynamically assign colors
+        }));
+
+        // Set the chart data and calculate total expenses
+        setChartData(mappedData);
+        const total = mappedData.reduce((acc: any, curr: { amount: any; }) => acc + curr.amount, 0);
+        setTotalExpenses(total);
+      } catch (error) {
+        console.error("Error fetching expense distribution:", error);
+      }
+    }
+
+    getExpenseDistribution();
+  }, [userId]);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col dark:text-white">
       <CardHeader className="items-center pb-0">
         <CardTitle>Expense Distribution</CardTitle>
-        {/* <CardDescription>January - June 2024</CardDescription> */}
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[40vh]"
+          config={{ /* your chart configuration here */ }}
         >
           <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="category"
-              innerRadius={60}
-              strokeWidth={5}
-              fill="#8884d8"
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            {chartData.length > 0 ? ( // Check if there is data
+              <Pie
+                data={chartData}
+                dataKey="amount"
+                nameKey="category"
+                innerRadius={70}
+                strokeWidth={5}
+                fill="#8884d8"
+              >
+                {chartData.map((entry: ChartDataEntry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          className="dark:text-white"
                         >
-                          ${totalExpenses.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Total Expenses
-                        </tspan>
-                      </text>
-                    )
-                  }
-                }}
-              />
-            </Pie>
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold dark:text-white"
+                          >
+                            ${totalExpenses.toLocaleString()}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground dark:text-white"
+                          >
+                            Total Expenses
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            ) : (
+              <text
+                x="50%"
+                y="50%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-gray-500 dark:text-gray-400"
+              >
+                No Data
+              </text>
+            )}
           </PieChart>
         </ChartContainer>
       </CardContent>
-      {/* <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Expenses up by 3.8% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total expenses for the last 6 months
-        </div>
-      </CardFooter> */}
     </Card>
-  )
+  );
 }

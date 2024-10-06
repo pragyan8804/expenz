@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
+import axios from 'axios';
 
 interface DeleteTransactionProps {
   transactionId: string;
@@ -22,11 +23,10 @@ const DeleteTransaction: React.FC<DeleteTransactionProps> = ({ transactionId, on
         throw new Error("User ID not found.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/transactions/${transactionId}`, {
-        method: 'DELETE',
-      });
+      const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/transactions/${transactionId}`);
 
-      if (!response.ok) {
+      // Check if the response is successful
+      if (response.status !== 200) {
         throw new Error("Failed to delete transaction.");
       }
 
@@ -52,9 +52,9 @@ const DeleteTransaction: React.FC<DeleteTransactionProps> = ({ transactionId, on
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogTitle className='dark:text-white'>Are you sure?</DialogTitle>
           </DialogHeader>
-          <p>Do you really want to delete this transaction? This action cannot be undone.</p>
+          <p className='dark:text-white'>Do you really want to delete this transaction? This action cannot be undone.</p>
           {error && <p className="text-red-500">{error}</p>}
           <DialogFooter>
             <Button variant="secondary" onClick={() => setIsOpen(false)} disabled={loading}>

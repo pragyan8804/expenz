@@ -88,16 +88,16 @@ router.get("/totals/:userId", async (req: Request, res: Response) => {
     // Get the total expenses, income, and investments for the user
     const [totalExpenses, totalIncome, totalInvestments] = await Promise.all([
       Transaction.aggregate([
-        { $match: { userId: objectUserId, category: "Expense" } }, // Match transactions for "Expense" category
-        { $group: { _id: null, totalAmount: { $sum: "$amount" } } } // Sum amounts
+        { $match: { userId: objectUserId, category: "Expense" } },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
       ]),
       Transaction.aggregate([
-        { $match: { userId: objectUserId, category: "Income" } }, // Match transactions for "Income" category
-        { $group: { _id: null, totalAmount: { $sum: "$amount" } } } // Sum amounts
+        { $match: { userId: objectUserId, category: "Income" } },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
       ]),
       Transaction.aggregate([
-        { $match: { userId: objectUserId, category: "Investment" } }, // Match transactions for "Investment" category
-        { $group: { _id: null, totalAmount: { $sum: "$amount" } } } // Sum amounts
+        { $match: { userId: objectUserId, category: "Investment" } },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
       ]),
     ]);
 

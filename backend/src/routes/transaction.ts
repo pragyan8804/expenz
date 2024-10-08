@@ -134,4 +134,60 @@ router.get("/expenses/distribution/:userId", async (req: Request, res: Response)
   }
 });
 
+// Route to get income and expenses by month for a specific user
+router.get("/totals/monthly/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  try {
+    // Convert userId to ObjectId for aggregation queries
+    const objectUserId = new mongoose.Types.ObjectId(userId);
+
+    // Aggregate income and expenses by month for the user
+    const monthlyData = await Transaction.aggregate([
+      { $match: { userId: objectUserId } }, // Filter by userId
+      {
+        $group: {
+          _id: {
+            month: { $month: "$date" },    // Group by month
+            year: { $year: "$date" },      // Also group by year to avoid issues across different years
+            category: "$category"          // Group by category (Income or Expense)
+          },
+          totalAmount: { $sum: "$amount" } // Sum amounts for each category
+        }
+      },
+      {
+        $group: {
+          _id: {
+            month: "$_id.month",
+            year: "$_id.year",
+          },
+          income: {
+            $sum: {
+              $cond: [{ $eq: ["$_id.category", "Income"] }, "$totalAmount", 0]
+            }
+          },
+          expenses: {
+            $sum: {
+              $cond: [{ $eq: ["$_id.category", "Expense"] }, "$totalAmount", 0]
+            }
+          }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }, // Sort by year and month
+      {
+        $project: {
+          month: "$_id.month",
+          year: "$_id.year",
+          income: 1,
+          expenses: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(monthlyData);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving monthly income and expenses", error: (error as Error).message });
+  }
+});
+
 export default router;

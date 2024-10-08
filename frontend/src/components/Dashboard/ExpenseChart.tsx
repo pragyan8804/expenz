@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Label, Pie, PieChart, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -7,6 +6,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import axios from 'axios';
+import { useEffect, useState } from "react";
 
 const fetchExpenseDistribution = async (userId: string) => {
   const response = await axios.get(
@@ -15,21 +15,19 @@ const fetchExpenseDistribution = async (userId: string) => {
   return response.data;
 };
 
-// Define the interface for chart data entries
 interface ChartDataEntry {
     fill: string;
 }
 
 export function ExpenseChart() {
-  const [chartData, setChartData] = React.useState<ChartDataEntry[]>([]);
-  const [totalExpenses, setTotalExpenses] = React.useState(0);
+  const [chartData, setChartData] = useState<ChartDataEntry[]>([]);
+  const [totalExpenses, setTotalExpenses] = useState(0);
 
   const userId = localStorage.getItem("userId");
 
-  // Fetch expense distribution data when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     async function getExpenseDistribution() {
-      if (!userId) return; // Ensure userId is not null or undefined
+      if (!userId) return;
       try {
         const expenseData = await fetchExpenseDistribution(userId);
 
@@ -60,7 +58,7 @@ export function ExpenseChart() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           className="mx-auto aspect-square max-h-[40vh]"
-          config={{ /* your chart configuration here */ }}
+          config={{ }}
         >
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

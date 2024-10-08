@@ -36,7 +36,7 @@ export function Dashboard() {
         <h1 className="text-3xl font-bold mb-8">Financial Overview</h1>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6 bg-white shadow-sm">
             <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-400">Total Expenses</h2>
             <p className="text-3xl font-bold mt-2">${totals.totalExpenses.toFixed(2)}</p>
@@ -52,7 +52,7 @@ export function Dashboard() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 justify-center align-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 justify-center align-center">
           <ExpenseChart />
           <IncomeVsExpenses />
         </div>

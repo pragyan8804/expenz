@@ -1,36 +1,20 @@
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
-  CardDescription,
-  // CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-export const description = "An income vs expenses bar chart"
-
-const chartData = [
-  { month: "January", income: 3000, expenses: 2500 },
-  { month: "February", income: 3500, expenses: 2800 },
-  { month: "March", income: 3200, expenses: 3000 },
-  { month: "April", income: 3800, expenses: 3200 },
-  { month: "May", income: 3600, expenses: 3100 },
-  { month: "June", income: 4000, expenses: 3500 },
-  { month: "July", income: 4000, expenses: 3500 },
-  { month: "August", income: 4000, expenses: 3500 },
-  { month: "September", income: 4000, expenses: 3500 },
-  { month: "October", income: 4000, expenses: 3500 },
-  { month: "November", income: 4000, expenses: 3500 },
-  { month: "December", income: 4000, expenses: 3500 },
-]
+export const description = "An income vs expenses bar chart";
 
 const chartConfig = {
   income: {
@@ -41,14 +25,44 @@ const chartConfig = {
     label: "Expenses",
     color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function IncomeVsExpenses() {
+  const [chartData, setChartData] = useState([]);
+
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchData = async () => {
+       if (!userId) return;
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/transactions/totals/monthly/${userId}`
+        );
+        const data = response.data;
+
+        // Format the data for recharts
+        const formattedData = data.map((item: any) => ({
+          month: new Date(item.year, item.month - 1).toLocaleString("default", {
+            month: "long",
+          }),
+          income: item.income,
+          expenses: item.expenses,
+        }));
+
+        setChartData(formattedData);
+      } catch (error) {
+        console.error("Error fetching chart data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Income vs Expenses</CardTitle>
-        <CardDescription>January - December 2024</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -71,5 +85,5 @@ export function IncomeVsExpenses() {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

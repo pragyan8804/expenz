@@ -6,6 +6,7 @@ import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import groupRoutes from './routes/group';
 import groupTransactionRoutes from './routes/grouptransaction';
+import checkUsernameRoutes from './routes/checkusername';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/group-transactions', groupTransactionRoutes);
+app.use('/api/check-username', checkUsernameRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || '';

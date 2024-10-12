@@ -68,4 +68,18 @@ router.get("/users/:userId", async (req: Request, res: Response): Promise<void> 
   }
 });
 
+//Get user ids from usernames (used in group creation)
+router.post('/users/ids', async (req: any, res: any) => {
+    const { usernames } = req.body;
+
+    try {
+        const users = await User.find({ username: { $in: usernames } }, '_id'); // Get only the ObjectIds
+        const userIds = users.map(user => user._id);
+
+        res.status(200).json(userIds);  // Send back the array of ObjectIds
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user IDs', error: (error as Error).message });
+    }
+});
+
 export default router;

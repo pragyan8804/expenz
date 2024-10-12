@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
+import groupRoutes from './routes/group';
+import groupTransactionRoutes from './routes/grouptransaction';
 
 dotenv.config();
 
@@ -13,6 +15,9 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/group-transactions', groupTransactionRoutes);
+
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || '';
 
@@ -24,4 +29,3 @@ mongoose.connect(MONGO_URI)
     .catch((error) => {
         console.error('MongoDB connection error:', error.message);
     });
-

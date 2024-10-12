@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import Transaction from "../models/Transactions";
+import Transaction from "../models/Transactions.model";
 import mongoose from "mongoose";
 
 const router = express.Router();

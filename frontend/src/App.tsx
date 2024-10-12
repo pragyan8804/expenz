@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Settings from './pages/Settings';
 import { ThemeProvider } from './components/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import Split from './pages/Split';
 
 function App() {
   return (
@@ -32,6 +33,11 @@ function App() {
             <Route path="/settings" element={
               <ProtectedRoute>
                 <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/split" element={
+              <ProtectedRoute>
+                <Split />
               </ProtectedRoute>
             } />
           </Routes>

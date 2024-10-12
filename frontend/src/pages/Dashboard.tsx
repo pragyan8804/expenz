@@ -58,7 +58,7 @@ export function Dashboard() {
         </div>
 
         {/* Add Expense Button */}
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-8 right-8">
           <AddTransactionModal />
         </div>
       </main>

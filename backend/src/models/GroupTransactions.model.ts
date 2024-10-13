@@ -35,4 +35,4 @@ const groupTransactionSchema = new mongoose.Schema({
     }
 }); 
 
-export default mongoose.model('GroupTransactions', groupTransactionSchema)
+export default mongoose.model('GroupTransactions', groupTransactionSchema);

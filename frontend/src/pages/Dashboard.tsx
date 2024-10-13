@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
-import { AddTransactionModal } from "@/components/Dashboard/AddTransactionModal";
+import { AddTransactionModal } from "@/components/Modals/AddTransactionModal";
 import { ExpenseChart } from "@/components/Dashboard/ExpenseChart";
 import { IncomeVsExpenses } from "@/components/Dashboard/IncomeVsExpenses";
 import axios from "axios";

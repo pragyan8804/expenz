@@ -83,7 +83,7 @@ export function AddGroupModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Group</Button>
+        <Button variant="default">Add Group</Button>
       </DialogTrigger>
       <DialogContent className="bg-white text-black dark:bg-black dark:text-white">
         <DialogHeader>
@@ -154,7 +154,7 @@ export function AddGroupModal() {
           </div>
         </div>
 
-        {/* Actions */}
+        {/* Cancel and Add button */}
         <div className="mt-6 flex justify-end space-x-4">
           <DialogClose asChild>
             <Button variant="secondary">Cancel</Button>

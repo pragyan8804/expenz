@@ -10,6 +10,7 @@ import Settings from './pages/Settings';
 import { ThemeProvider } from './components/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Split from './pages/Split';
+import Group from './pages/Group';
 
 function App() {
   return (
@@ -38,6 +39,11 @@ function App() {
             <Route path="/split" element={
               <ProtectedRoute>
                 <Split />
+              </ProtectedRoute>
+            } />
+            <Route path="//groups/:groupId" element={
+              <ProtectedRoute>
+                <Group />
               </ProtectedRoute>
             } />
           </Routes>

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { AddTransactionModal } from "@/components/Modals/AddTransactionModal";
-import { ExpenseChart } from "@/components/Dashboard/ExpenseChart";
-import { IncomeVsExpenses } from "@/components/Dashboard/IncomeVsExpenses";
+import { ExpenseChart } from "@/components/Charts/ExpenseChart";
+import { IncomeVsExpenses } from "@/components/Charts/IncomeVsExpenses";
 import axios from "axios";
 
 export function Dashboard() {

@@ -37,10 +37,33 @@ router.post('/create', async (req: any, res: any) => {
 })
 
 // Get all groups for the split page
-router.get('/', async (_req, res) => {
+// router.get('/', async (_req, res) => {
+//     try {
+//         // Fetch all groups and populate members' details
+//         const groups = await Group.find().populate('members', 'username _id');
+//         res.status(200).json(groups);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error fetching groups', error: (error as Error).message });
+//     }
+// });
+
+//Get the groups of that user on the split page
+router.get('/', async (req: any, res) => {
     try {
-        // Fetch all groups and populate members' details
-        const groups = await Group.find().populate('members', 'username _id');
+        const { userId } = req.query; // Get the userId from query parameters or you can use req.body for POST
+
+        // Validate if userId is provided
+        if (!userId) {
+            res.status(400).json({ message: 'User ID is required' });
+        }
+
+        // Find groups where the current user is a member
+        const groups = await Group.find({ members: userId }).populate('members', 'username _id');
+
+        if (!groups.length) {
+            res.status(404).json({ message: 'No groups found for this user' });
+        }
+
         res.status(200).json(groups);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching groups', error: (error as Error).message });
@@ -58,10 +81,15 @@ router.get('/:groupId', async (req, res) => {
         }
 
         const group = await Group.findById(groupId)
-            .populate('members', 'username _id')
+            .populate('members', ' name username _id')
             .populate({
                 path: 'groupTransactions',
                 model: 'GroupTransactions',
+                populate: {
+                    path: 'paidBy',
+                    model: 'User',
+                    select: 'username name'
+                }
             })
             .populate({
                 path: 'owes.from owes.to',

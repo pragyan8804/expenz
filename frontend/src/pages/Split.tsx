@@ -21,16 +21,18 @@ interface Group {
 const Split = () => {
   const navigate = useNavigate();
   const [groups, setGroups] = useState<Group[]>([]); // Set the type for groups
+  const currentUserId = localStorage.getItem("userId");
 
   // Fetch groups from backend
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/groups`);
-        setGroups(response.data); // TypeScript now knows the structure of response.data
-      } catch (error) {
-        console.error("Error fetching groups:", error);
-      }
+    const fetchGroups = () => {
+      axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/groups?userId=${currentUserId}`)
+        .then(response => {
+          setGroups(response.data); // Handle the groups data
+        })
+        .catch(error => {
+          console.error("Error fetching groups:", error);
+        });
     };
     fetchGroups();
   }, []);

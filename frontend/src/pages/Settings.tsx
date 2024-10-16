@@ -1,53 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Sun, Moon } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useTheme } from '@/components/ThemeContext';
-import { Sidebar } from '@/components/Sidebar';
-import { useAuth } from '@/context/AuthContext';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Sun, Moon } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { useTheme } from '@/components/ThemeContext'
+import { Sidebar } from '@/components/Sidebar'
+import { useAuth } from '@/context/AuthContext'
+import { jwtDecode } from 'jwt-decode'
+import axios from 'axios'
 
 export interface User {
-  username: string;
-  email: string;
+  username: string
+  name: string
 }
 
 const Settings: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
-  const [user, setUser] = useState<User | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme()
+  const [user, setUser] = useState<User | null>(null)
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (token) {
       try {
-        const decodedToken: any = jwtDecode(token);
-        const userId = decodedToken.userId;
+        const decodedToken: any = jwtDecode(token)
+        const userId = decodedToken.userId
 
         // Fetch user details from the backend
         const fetchUserDetails = async () => {
           try {
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users/${userId}`, { 
-              headers: {
-                'Authorization': `Bearer ${token}`,
-              },
-            });
-            setUser(response.data); // Set user details from response
+            const response = await axios.get(
+              `${import.meta.env.VITE_BACKEND_URL}/api/auth/users/${userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
+            setUser(response.data) // Set user details from response
           } catch (error) {
-            console.error('Failed to fetch user details:', error);
+            console.error('Failed to fetch user details:', error)
           }
-        };
+        }
 
-        fetchUserDetails();
+        fetchUserDetails()
       } catch (error) {
-        console.error('Failed to decode token:', error);
+        console.error('Failed to decode token:', error)
       }
     } else {
-      console.warn('No token found in local storage');
+      console.warn('No token found in local storage')
     }
-  }, []);
+  }, [])
 
   return (
     <div className="flex dark:bg-black dark:text-white h-screen overflow-y-auto">
@@ -61,8 +64,11 @@ const Settings: React.FC = () => {
               <CardTitle>User Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <div>
+              <div className="mb-2">
                 <Label>Username: {user.username}</Label>
+              </div>
+              <div className="mb-2">
+                <Label>Name: {user.name}</Label>
               </div>
             </CardContent>
           </Card>
@@ -81,14 +87,18 @@ const Settings: React.FC = () => {
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
               >
-                {theme === 'dark' ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
+                {theme === 'dark' ? (
+                  <Sun className="h-[1.2rem] w-[1.2rem]" />
+                ) : (
+                  <Moon className="h-[1.2rem] w-[1.2rem]" />
+                )}
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Settings;
+export default Settings

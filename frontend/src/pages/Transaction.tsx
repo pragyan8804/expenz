@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Sidebar } from '@/components/Sidebar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import DeleteTransaction from '@/components/Transaction/DeleteTransaction';
+import DeleteTransaction from '@/components/Dialogs/DeleteTransaction';
 import axios from 'axios';
 
 type Transaction = {

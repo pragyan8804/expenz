@@ -1,10 +1,15 @@
+import { AddGroupMemberModal } from "../Modals/AddGroupMemberModal";
+
 const GroupDetailsTab = ({ group }: { group: any }) => {
   return (
-    <div>
-      {/* Group Members */}
+    <div className="my-4 dark:text-white">
+
+      <AddGroupMemberModal groupId={group._id} />
+
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">
         Group Members
       </h2>
+
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
         {group.members.length === 0 ? (
           <p className="text-gray-700 dark:text-gray-400">No members yet</p>
@@ -24,13 +29,12 @@ const GroupDetailsTab = ({ group }: { group: any }) => {
         )}
       </div>
 
-      {/* Group Description */}
-      <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">
+      {/* <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">
         Description
       </h2>
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
         <p className="text-lg text-gray-700 dark:text-gray-300">{group.description}</p>
-      </div>
+      </div> */}
     </div>
   );
 };

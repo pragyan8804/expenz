@@ -13,10 +13,12 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 export function AddGroupModal() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [members, setMembers] = useState([{ username: "", valid: null as boolean | null }]); // Allow true, false, and null
 
   // Function to handle adding a new participant input
@@ -53,7 +55,14 @@ export function AddGroupModal() {
   // Filter valid members
   const validMembers = members.filter(p => p.valid).map(p => p.username);
 
-  if (validMembers.length === 0) return alert("Please add at least one valid member.");
+  if (validMembers.length === 0) {
+    toast({
+      title: "Error",
+      description: "Please add at least one valid member.",
+      variant: "destructive",
+    })
+    return;
+  }
 
   try {
     // Fetch ObjectIds for valid usernames
@@ -70,56 +79,68 @@ export function AddGroupModal() {
     const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups/create`, groupData);
 
     if (res.status === 201) {
-      alert("Group created successfully");
+      toast({
+        title: "Group created",
+        description: "Group created successfully",
+        variant: "default",
+      })
+      setIsOpen(false);
+      window.location.reload();
     } else {
-      alert("Error creating group");
+      toast({
+        title: "Error",
+        description: "Failed to create group",
+        variant: "destructive",
+      })
     }
   } catch (error) {
-    alert("An error occurred");
+    toast({
+      title: "Error",
+      description: "Failed to create group",
+      variant: "destructive",
+    })
     console.error(error);
   }
 };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="default">Add Group</Button>
       </DialogTrigger>
       <DialogContent className="bg-white text-black dark:bg-black dark:text-white">
         <DialogHeader>
-          <DialogTitle>Add Group</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="dark:text-white">Add Group</DialogTitle>
+          <DialogDescription className="dark:text-white">
             Enter the details of your new group below.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Group Form */}
-        <div className="space-y-4">
-          {/* Group Name */}
+        <div className="space-y-4 dark:text-white">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="dark:text-white">Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Group Name"
+              className="dark:text-white"
             />
           </div>
 
-          {/* Group Description */}
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="dark:text-white">Description</Label>
             <Input
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Group Description"
+              className="dark:text-white"
             />
           </div>
 
-          {/* Participants Section */}
           <div>
-            <Label>Members</Label>
+            <Label className="dark:text-white">Members</Label>
 
             {members.map((member, index) => (
               <div key={index} className="flex items-center mt-2 space-x-2">
@@ -147,14 +168,13 @@ export function AddGroupModal() {
             <Button
               onClick={addMembers}
               variant="outline"
-              className="mt-2"
+              className="mt-2 dark:text-white"
             >
               Add Member
             </Button>
           </div>
         </div>
 
-        {/* Cancel and Add button */}
         <div className="mt-6 flex justify-end space-x-4">
           <DialogClose asChild>
             <Button variant="secondary">Cancel</Button>

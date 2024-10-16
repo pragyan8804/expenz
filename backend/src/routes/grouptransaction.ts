@@ -64,4 +64,52 @@ router.post('/add', async (req: any, res: any) => {
     }
 })
 
+//Settle up
+router.post('/settle-up', async (req: any, res: any) => {
+    try {
+        const { amount, paidBy, paidTo, groupId } = req.body;
+
+        //group id shjould be valid
+        if (!mongoose.Types.ObjectId.isValid(groupId)) {
+            return res.status(400).json({ message: 'Invalid groupId' });
+        }
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found' });
+        }
+        
+        //find owe entry between paidBy user and paidTo user
+
+        const oweEntry = group.owes.find(o => o.from?.equals(paidBy) && o.to?.equals(paidTo));
+
+        if (!oweEntry) {
+            return res.status(404).json({ message: 'Owe entry not found between these two' });
+        }
+
+        //subtract
+        oweEntry.amount -= amount;
+
+        //if  owe entry is 0, remove it
+        // if (oweEntry.amount <= 0) {
+        //     group.owes = group.owes.filter(
+        //         (owe) => !(owe.from?.equals(paidBy) && owe.to?.equals(paidTo))
+        //     );
+        // }
+        if (oweEntry.amount <= 0) {
+            const index = group.owes.indexOf(oweEntry);
+            if (index > -1) {
+                group.owes.splice(index, 1);  // This is the correct way to remove a DocumentArray element
+            }
+        }
+
+        await group.save();
+
+        res.status(200).json({ message: 'Settled up successfully' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error settling up', error: (error as Error).message });
+    }
+})
+
 export default router;

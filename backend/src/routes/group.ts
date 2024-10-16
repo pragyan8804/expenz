@@ -108,4 +108,41 @@ router.get('/:groupId', async (req, res) => {
     }
 });
 
+//Add member to existing group
+router.post('/add-member/:groupId', async (req: any, res: any) => {
+    try {
+        const { groupId } = req.params;
+        const { usernames } = req.body;
+
+        const validUsers = await User.find({ username: { $in: usernames } });
+
+        if (validUsers.length !== usernames.length) {
+            return res.status(400).json({ message: 'user does not exist' });
+        }
+
+        const userIds = validUsers.map(user => user._id);
+
+            // Update the group by adding new members
+        const group = await Group.findByIdAndUpdate(
+        groupId,
+        { $addToSet: { members: { $each: userIds } } }, // Prevent duplicates
+        { new: true }
+        ).populate('members', 'username name _id');
+
+        if(!group) {
+            res.status(404).json({ message: 'Group not found' });
+        }
+
+        // Add group to each new user's list of groups
+        await User.updateMany(
+        { _id: { $in: userIds } },
+        { $addToSet: { groups: groupId } } // Prevent duplicates
+        );
+
+        res.status(200).json({ message: 'Group updated successfully', group });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating group', error: (error as Error).message });
+    }
+});
+
 export default router

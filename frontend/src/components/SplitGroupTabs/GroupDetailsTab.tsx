@@ -10,7 +10,7 @@ const GroupDetailsTab = ({ group }: { group: any }) => {
         Group Members
       </h2>
 
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <div className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow">
         {group.members.length === 0 ? (
           <p className="text-gray-700 dark:text-gray-400">No members yet</p>
         ) : (

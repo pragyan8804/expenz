@@ -1,45 +1,63 @@
-import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from '@/components/ui/dropdown-menu'
+import { MultiSelect } from '@/components/ui/multi-select'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 export const AddExpenseModal = ({ groupId }: { groupId: string }) => {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState<number>(0);
-  const [paidBy, setPaidBy] = useState<string | undefined>(undefined);
-  const [splitBetween, setSplitBetween] = useState<string[]>([]);
-  const [members, setMembers] = useState<{ _id: string; username: string }[]>([]);
+  const [description, setDescription] = useState('')
+  const [amount, setAmount] = useState<number>(0)
+  const [paidBy, setPaidBy] = useState<string | undefined>(undefined)
+  const [splitBetween, setSplitBetween] = useState<string[]>([])
+  const [members, setMembers] = useState<{ _id: string; username: string }[]>(
+    []
+  )
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/groups/${groupId}`);
-        setMembers(data.members);
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/groups/${groupId}`
+        )
+        setMembers(data.members)
       } catch (error) {
-        console.error("Error fetching group members:", error);
+        console.error('Error fetching group members:', error)
       }
-    };
+    }
 
-    fetchGroupMembers();
-  }, [groupId]);
+    fetchGroupMembers()
+  }, [groupId])
 
   const handleAddExpense = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/group-transactions/add`, {
-        amount,
-        description,
-        paidBy,
-        groupId,
-        splitBetween,
-      });
-      window.location.reload();
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/group-transactions/add`,
+        {
+          amount,
+          description,
+          paidBy,
+          groupId,
+          splitBetween,
+        }
+      )
+      window.location.reload()
     } catch (error) {
-      console.error("Error adding expense:", error);
+      console.error('Error adding expense:', error)
     }
-  };
+  }
 
   return (
     <Dialog>
@@ -59,17 +77,24 @@ export const AddExpenseModal = ({ groupId }: { groupId: string }) => {
               type="number"
               placeholder="0"
               value={amount}
-              onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : 0)}
+              onChange={(e) =>
+                setAmount(e.target.value ? Number(e.target.value) : 0)
+              }
             />
             {/* Paid By (Dropdown Menu) */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {paidBy ? members.find((m) => m._id === paidBy)?.username : "Paid By"}
+                  {paidBy
+                    ? members.find((m) => m._id === paidBy)?.username
+                    : 'Paid By'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuRadioGroup value={paidBy} onValueChange={setPaidBy}>
+                <DropdownMenuRadioGroup
+                  value={paidBy}
+                  onValueChange={setPaidBy}
+                >
                   {members.map((member) => (
                     <DropdownMenuRadioItem key={member._id} value={member._id}>
                       {member.username}
@@ -96,5 +121,5 @@ export const AddExpenseModal = ({ groupId }: { groupId: string }) => {
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

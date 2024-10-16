@@ -6,143 +6,161 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
-import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useState } from 'react'
+import { SelectGroup, SelectLabel } from '@radix-ui/react-select'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import axios from 'axios'
+import { useToast } from '@/hooks/use-toast'
 
 export function AddTransactionModal() {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [subCategory, setSubCategory] = useState("");
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [notes, setNotes] = useState("");
-  const [amount, setAmount] = useState("");
-  const [_subCategories, setSubCategories] = useState<string[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { toast } = useToast();
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('')
+  const [subCategory, setSubCategory] = useState('')
+  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [notes, setNotes] = useState('')
+  const [amount, setAmount] = useState('')
+  const [_subCategories, setSubCategories] = useState<string[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { toast } = useToast()
 
   const resetForm = () => {
-    setName("");
-    setCategory("");
-    setSubCategory("");
-    setDate(new Date());
-    setNotes("");
-    setAmount("");
-    setSubCategories([]);
-  };
+    setName('')
+    setCategory('')
+    setSubCategory('')
+    setDate(new Date())
+    setNotes('')
+    setAmount('')
+    setSubCategories([])
+  }
 
   const handleOpenChange = (open: boolean) => {
-    setIsModalOpen(open);
+    setIsModalOpen(open)
     if (open) {
-      resetForm();
+      resetForm()
     }
-  };
+  }
 
-  const showToast = (title: string, description: string, variant: "default" | "destructive") => {
+  const showToast = (
+    title: string,
+    description: string,
+    variant: 'default' | 'destructive'
+  ) => {
     const { dismiss } = toast({
       title,
       description,
       variant,
-    });
+    })
 
     setTimeout(() => {
-      dismiss();
-    }, 2000);
-  };
+      dismiss()
+    }, 2000)
+  }
 
   // Categories with subcategories and group labels
   const categories = {
     Expense: {
       Essentials: [
-        "Food & Dining",
-        "Groceries",
-        "Healthcare",
-        "Education",
-        "Taxes",
-        "Bills & Fees",
-        "Housing",
-        "Utilities",
-        "Insurance",
-        "Debt Payments",
+        'Food & Dining',
+        'Groceries',
+        'Healthcare',
+        'Education',
+        'Taxes',
+        'Bills & Fees',
+        'Housing',
+        'Utilities',
+        'Insurance',
+        'Debt Payments',
       ],
       Lifestyle: [
-        "Transportation",
-        "Entertainment",
-        "Shopping",
-        "Personal Care",
-        "Travel",
-        "Gifts & Donations",
-        "Subscriptions",
+        'Transportation',
+        'Entertainment',
+        'Shopping',
+        'Personal Care',
+        'Travel',
+        'Gifts & Donations',
+        'Subscriptions',
       ],
-      Miscellaneous: ["Miscellaneous"],
+      Miscellaneous: ['Miscellaneous'],
     },
     Income: {
-      "Primary Income": ["Salary", "Business", "Freelance"],
-      "Passive Income": [
-        "Investments",
-        "Rental Income",
-        "Dividends",
-        "Interest",
-        "Royalties",
+      'Primary Income': ['Salary', 'Business', 'Freelance'],
+      'Passive Income': [
+        'Investments',
+        'Rental Income',
+        'Dividends',
+        'Interest',
+        'Royalties',
       ],
-      "Other Income": [
-        "Gifts Received",
-        "Tax Refunds",
-        "Government Benefits",
-        "Side Hustle",
-        "Commissions",
-        "Bonuses",
+      'Other Income': [
+        'Gifts Received',
+        'Tax Refunds',
+        'Government Benefits',
+        'Side Hustle',
+        'Commissions',
+        'Bonuses',
       ],
     },
     Investment: {
-      "Traditional Investments": [
-        "Stocks",
-        "Bonds",
-        "Mutual Funds",
-        "ETFs",
-        "Real Estate",
+      'Traditional Investments': [
+        'Stocks',
+        'Bonds',
+        'Mutual Funds',
+        'ETFs',
+        'Real Estate',
       ],
-      "Alternative Investments": [
-        "Cryptocurrency",
-        "Commodities",
-        "P2P Lending",
-        "Startups",
-        "Art & Collectibles",
+      'Alternative Investments': [
+        'Cryptocurrency',
+        'Commodities',
+        'P2P Lending',
+        'Startups',
+        'Art & Collectibles',
       ],
-      "Retirement & Savings": [
-        "Retirement Accounts",
-        "Savings Accounts",
-        "Certificates of Deposit",
+      'Retirement & Savings': [
+        'Retirement Accounts',
+        'Savings Accounts',
+        'Certificates of Deposit',
       ],
-      "Advanced Instruments": ["Forex", "Options"],
+      'Advanced Instruments': ['Forex', 'Options'],
     },
-  };
+  }
 
   // Update subcategories when category changes
   const handleCategoryChange = (value: keyof typeof categories) => {
-    setCategory(value);
-    setSubCategories(Object.values(categories[value]).flat() || []);
-    setSubCategory("");
-  };
+    setCategory(value)
+    setSubCategories(Object.values(categories[value]).flat() || [])
+    setSubCategory('')
+  }
 
   const handleAddTransaction = async () => {
     // Get userId from localStorage
-    const userId = localStorage.getItem("userId");
+    const userId = localStorage.getItem('userId')
     if (!userId) {
-      console.error("No userId found");
-      showToast("Error", "User ID not found. Please log in again.", "destructive");
-      return;
+      console.error('No userId found')
+      showToast(
+        'Error',
+        'User ID not found. Please log in again.',
+        'destructive'
+      )
+      return
     }
 
     // Prepare the transaction data
@@ -154,29 +172,33 @@ export function AddTransactionModal() {
       date,
       notes,
       amount,
-    };
+    }
 
     try {
       // Send transaction to backend
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/transactions/add`,
         transactionData
-      );
+      )
 
-      console.log("Transaction added successfully:", response.data);
-      
+      console.log('Transaction added successfully:', response.data)
+
       // Show success toast
-      showToast("Success", "Transaction added successfully", "default");
+      showToast('Success', 'Transaction added successfully', 'default')
 
       // Close modal on success
-      setIsModalOpen(false);
+      setIsModalOpen(false)
     } catch (error) {
-      console.error("Error adding transaction:", error);
-      
+      console.error('Error adding transaction:', error)
+
       // Show error toast
-      showToast("Error", "Failed to add transaction. Please try again.", "destructive");
+      showToast(
+        'Error',
+        'Failed to add transaction. Please try again.',
+        'destructive'
+      )
     }
-  };
+  }
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
@@ -270,14 +292,14 @@ export function AddTransactionModal() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    variant={"outline"}
+                    variant={'outline'}
                     className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
+                      'w-full justify-start text-left font-normal',
+                      !date && 'text-muted-foreground'
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    {date ? format(date, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -313,5 +335,5 @@ export function AddTransactionModal() {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

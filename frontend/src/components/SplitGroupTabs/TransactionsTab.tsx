@@ -9,7 +9,7 @@ const TransactionsTab = ({ group, groupId }: { group: any; groupId: string }) =>
       </div>
 
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">Transactions</h2>
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <div className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow">
         {group.groupTransactions.length === 0 ? (
           <p className="text-gray-700 dark:text-gray-400">No transactions yet</p>
         ) : (

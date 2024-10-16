@@ -1,44 +1,62 @@
-import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from '@/components/ui/dropdown-menu'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 export const SettleUpModal = ({ groupId }: { groupId: string }) => {
-  const [amount, setAmount] = useState<number>(0);
-  const [paidBy, setPaidBy] = useState<string | undefined>(undefined);
-  const [paidTo, setPaidTo] = useState<string | undefined>(undefined);
-  const [members, setMembers] = useState<{ _id: string; username: string }[]>([]);
+  const [amount, setAmount] = useState<number>(0)
+  const [paidBy, setPaidBy] = useState<string | undefined>(undefined)
+  const [paidTo, setPaidTo] = useState<string | undefined>(undefined)
+  const [members, setMembers] = useState<{ _id: string; username: string }[]>(
+    []
+  )
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/groups/${groupId}`);
-        setMembers(data.members);
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/groups/${groupId}`
+        )
+        setMembers(data.members)
       } catch (error) {
-        console.error("Error fetching group members:", error);
+        console.error('Error fetching group members:', error)
       }
-    };
+    }
 
-    fetchGroupMembers();
-  }, [groupId]);
+    fetchGroupMembers()
+  }, [groupId])
 
   const handleSettleUp = async () => {
-    if (!paidBy || !paidTo || amount <= 0) return;
+    if (!paidBy || !paidTo || amount <= 0) return
 
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/group-transactions/settle-up`, {
-        amount,
-        paidBy,
-        paidTo,
-        groupId,
-      });
-      window.location.reload();
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/group-transactions/settle-up`,
+        {
+          amount,
+          paidBy,
+          paidTo,
+          groupId,
+        }
+      )
+      window.location.reload()
     } catch (error) {
-      console.error("Error settling up:", error);
+      console.error('Error settling up:', error)
     }
-  };
+  }
 
   return (
     <Dialog>
@@ -52,11 +70,16 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {paidBy ? members.find((m) => m._id === paidBy)?.username : "Paid By"}
+                  {paidBy
+                    ? members.find((m) => m._id === paidBy)?.username
+                    : 'Paid By'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuRadioGroup value={paidBy} onValueChange={setPaidBy}>
+                <DropdownMenuRadioGroup
+                  value={paidBy}
+                  onValueChange={setPaidBy}
+                >
                   {members.map((member) => (
                     <DropdownMenuRadioItem key={member._id} value={member._id}>
                       {member.username}
@@ -69,11 +92,16 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {paidTo ? members.find((m) => m._id === paidTo)?.username : "Paid To"}
+                  {paidTo
+                    ? members.find((m) => m._id === paidTo)?.username
+                    : 'Paid To'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuRadioGroup value={paidTo} onValueChange={setPaidTo}>
+                <DropdownMenuRadioGroup
+                  value={paidTo}
+                  onValueChange={setPaidTo}
+                >
                   {members.map((member) => (
                     <DropdownMenuRadioItem key={member._id} value={member._id}>
                       {member.username}
@@ -87,7 +115,9 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
               type="number"
               placeholder="0"
               value={amount}
-              onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : 0)}
+              onChange={(e) =>
+                setAmount(e.target.value ? Number(e.target.value) : 0)
+              }
             />
           </div>
 
@@ -97,5 +127,5 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

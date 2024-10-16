@@ -39,7 +39,6 @@ const Split = () => {
     fetchGroups();
   }, []);
 
-  // Handle group card click
   const handleGroupClick = (groupId: string) => {
     navigate(`/groups/${groupId}`);
   };
@@ -61,21 +60,23 @@ const Split = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 w-full">
-          {groups.map((group) => (
-            <div
-              key={group._id}
-              onClick={() => handleGroupClick(group._id)}
-              className="bg-white dark:bg-black border border-gray-300 dark:border-gray-600 p-4 rounded-lg shadow hover:cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-950 transition-all flex justify-between items-center"
-            >
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{group.name}</h2>
-                <p className="text-gray-700 dark:text-gray-400">
-                  Members: {group.members.map((member: User) => member.username).join(", ")}
-                </p>
+          {groups
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Sort groups by date created (latest to oldest)
+            .map((group) => (
+              <div
+                key={group._id}
+                onClick={() => handleGroupClick(group._id)}
+                className="bg-white dark:bg-black border border-gray-300 dark:border-gray-600 p-4 rounded-lg shadow hover:cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-950 transition-all flex justify-between items-center"
+              >
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{group.name}</h2>
+                  <p className="text-gray-700 dark:text-gray-400">
+                    Members: {group.members.map((member: User) => member.username).join(", ")}
+                  </p>
+                </div>
+                <span className="text-gray-500 dark:text-gray-300">{formatDate(group.createdAt)}</span>
               </div>
-              <span className="text-gray-500 dark:text-gray-300">{formatDate(group.createdAt)}</span>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>

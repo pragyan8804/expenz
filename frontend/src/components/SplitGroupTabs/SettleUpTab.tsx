@@ -8,7 +8,7 @@ const SettleUpTab = ({ group }: { group: any }) => {
 
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">Who Owes Whom</h2>
 
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+      <div className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow">
         {group.owes.length === 0 ? (
           <p className="text-gray-700 dark:text-gray-400">No one owes anyone yet</p>
         ) : (

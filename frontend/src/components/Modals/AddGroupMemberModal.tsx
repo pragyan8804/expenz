@@ -6,78 +6,86 @@ import {
   DialogDescription,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
-import axios from "axios";
-import { toast } from "@/hooks/use-toast";
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
+import axios from 'axios'
+import { toast } from '@/hooks/use-toast'
 
 export function AddGroupMemberModal({ groupId }: { groupId: string }) {
-  const [members, setMembers] = useState([{ username: "", valid: null as boolean | null }]); // Validity check
-  
-  const addMembers = () => setMembers([...members, { username: "", valid: null }]);
+  const [members, setMembers] = useState([
+    { username: '', valid: null as boolean | null },
+  ]) // Validity check
+
+  const addMembers = () =>
+    setMembers([...members, { username: '', valid: null }])
 
   const removeMembers = (index: number) => {
-    const updatedMembers = members.filter((_, i) => i !== index);
-    setMembers(updatedMembers);
-  };
+    const updatedMembers = members.filter((_, i) => i !== index)
+    setMembers(updatedMembers)
+  }
 
   const handleUsernameChange = async (index: number, username: string) => {
-    const updatedMembers = [...members];
-    updatedMembers[index].username = username;
+    const updatedMembers = [...members]
+    updatedMembers[index].username = username
 
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/check-username/${username}`);
-      updatedMembers[index].valid = response.status === 200 ? true : false;
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/check-username/${username}`
+      )
+      updatedMembers[index].valid = response.status === 200 ? true : false
     } catch (error) {
-      updatedMembers[index].valid = false;
+      updatedMembers[index].valid = false
     }
 
-    setMembers(updatedMembers);
-  };
+    setMembers(updatedMembers)
+  }
 
   const handleSubmit = async () => {
-    const validMembers = members.filter(p => p.valid).map(p => p.username);
+    const validMembers = members.filter((p) => p.valid).map((p) => p.username)
 
     if (validMembers.length === 0) {
       toast({
-        title: "Error",
-        description: "Please add at least one valid member.",
-        variant: "destructive",
-      });
-      return;
+        title: 'Error',
+        description: 'Please add at least one valid member.',
+        variant: 'destructive',
+      })
+      return
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups/add-member/${groupId}`, {
-        usernames: validMembers,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/groups/add-member/${groupId}`,
+        {
+          usernames: validMembers,
+        }
+      )
 
       if (response.status === 200) {
         toast({
-          title: "Members added",
-          description: "Group members added successfully",
-          variant: "default",
-        });
-        window.location.reload();
+          title: 'Members added',
+          description: 'Group members added successfully',
+          variant: 'default',
+        })
+        window.location.reload()
       } else {
         toast({
-          title: "Error",
-          description: "Failed to add members",
-          variant: "destructive",
-        });
+          title: 'Error',
+          description: 'Failed to add members',
+          variant: 'destructive',
+        })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to add members",
-        variant: "destructive",
-      });
-      console.error(error);
+        title: 'Error',
+        description: 'Failed to add members',
+        variant: 'destructive',
+      })
+      console.error(error)
     }
-  };
+  }
 
   return (
     <Dialog>
@@ -99,9 +107,18 @@ export function AddGroupMemberModal({ groupId }: { groupId: string }) {
                 value={member.username}
                 onChange={(e) => handleUsernameChange(index, e.target.value)}
                 placeholder="Username"
-                className={member.valid === true ? "border-green-500" : member.valid === false ? "border-red-500" : ""}
+                className={
+                  member.valid === true
+                    ? 'border-green-500'
+                    : member.valid === false
+                    ? 'border-red-500'
+                    : ''
+                }
               />
-              <button onClick={() => removeMembers(index)} className="text-red-500 hover:text-red-700">
+              <button
+                onClick={() => removeMembers(index)}
+                className="text-red-500 hover:text-red-700"
+              >
                 <Trash2 />
               </button>
             </div>
@@ -119,5 +136,5 @@ export function AddGroupMemberModal({ groupId }: { groupId: string }) {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

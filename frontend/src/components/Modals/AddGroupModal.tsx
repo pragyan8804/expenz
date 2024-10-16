@@ -6,102 +6,111 @@ import {
   DialogDescription,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
-import axios from "axios";
-import { toast } from "@/hooks/use-toast";
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
+import axios from 'axios'
+import { toast } from '@/hooks/use-toast'
 
 export function AddGroupModal() {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [members, setMembers] = useState([{ username: "", valid: null as boolean | null }]); // Allow true, false, and null
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const [members, setMembers] = useState([
+    { username: '', valid: null as boolean | null },
+  ]) // Allow true, false, and null
 
   // Function to handle adding a new participant input
   const addMembers = () => {
-    setMembers([...members, { username: "", valid: null }]);
-  };
+    setMembers([...members, { username: '', valid: null }])
+  }
 
   // Function to handle removing a participant
   const removeMembers = (index: number) => {
-    const updatedMembers = members.filter((_, i) => i !== index);
-    setMembers(updatedMembers);
-  };
+    const updatedMembers = members.filter((_, i) => i !== index)
+    setMembers(updatedMembers)
+  }
 
   // Function to handle username change and validate it with backend
   const handleUsernameChange = async (index: number, username: string) => {
-    const updatedMembers = [...members];
-    updatedMembers[index].username = username;
+    const updatedMembers = [...members]
+    updatedMembers[index].username = username
 
     // Send request to backend to check if username exists
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/check-username/${username}`);
-      updatedMembers[index].valid = response.status === 200 ? true : false; // Username exists or not
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/check-username/${username}`
+      )
+      updatedMembers[index].valid = response.status === 200 ? true : false // Username exists or not
     } catch (error) {
-      updatedMembers[index].valid = false; // Username doesn't exist
+      updatedMembers[index].valid = false // Username doesn't exist
     }
 
-    setMembers(updatedMembers);
-  };
-
+    setMembers(updatedMembers)
+  }
 
   //First get the userId from the backend, then hit the create route
   // Handle form submission to create the group
   const handleSubmit = async () => {
-  // Filter valid members
-  const validMembers = members.filter(p => p.valid).map(p => p.username);
+    // Filter valid members
+    const validMembers = members.filter((p) => p.valid).map((p) => p.username)
 
-  if (validMembers.length === 0) {
-    toast({
-      title: "Error",
-      description: "Please add at least one valid member.",
-      variant: "destructive",
-    })
-    return;
-  }
-
-  try {
-    // Fetch ObjectIds for valid usernames
-    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/users/ids`, { usernames: validMembers });
-
-    const userIds = response.data; // Array of ObjectIds
-
-    const groupData = {
-      name,
-      description,
-      members: userIds  // Use ObjectIds instead of usernames
-    };
-
-    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/groups/create`, groupData);
-
-    if (res.status === 201) {
+    if (validMembers.length === 0) {
       toast({
-        title: "Group created",
-        description: "Group created successfully",
-        variant: "default",
+        title: 'Error',
+        description: 'Please add at least one valid member.',
+        variant: 'destructive',
       })
-      setIsOpen(false);
-      window.location.reload();
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to create group",
-        variant: "destructive",
-      })
+      return
     }
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Failed to create group",
-      variant: "destructive",
-    })
-    console.error(error);
+
+    try {
+      // Fetch ObjectIds for valid usernames
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/users/ids`,
+        { usernames: validMembers }
+      )
+
+      const userIds = response.data // Array of ObjectIds
+
+      const groupData = {
+        name,
+        description,
+        members: userIds, // Use ObjectIds instead of usernames
+      }
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/groups/create`,
+        groupData
+      )
+
+      if (res.status === 201) {
+        toast({
+          title: 'Group created',
+          description: 'Group created successfully',
+          variant: 'default',
+        })
+        setIsOpen(false)
+        window.location.reload()
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to create group',
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to create group',
+        variant: 'destructive',
+      })
+      console.error(error)
+    }
   }
-};
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -118,7 +127,9 @@ export function AddGroupModal() {
 
         <div className="space-y-4 dark:text-white">
           <div>
-            <Label htmlFor="name" className="dark:text-white">Name</Label>
+            <Label htmlFor="name" className="dark:text-white">
+              Name
+            </Label>
             <Input
               id="name"
               value={name}
@@ -129,7 +140,9 @@ export function AddGroupModal() {
           </div>
 
           <div>
-            <Label htmlFor="description" className="dark:text-white">Description</Label>
+            <Label htmlFor="description" className="dark:text-white">
+              Description
+            </Label>
             <Input
               id="description"
               value={description}
@@ -150,10 +163,10 @@ export function AddGroupModal() {
                   placeholder="Username"
                   className={`${
                     member.valid === true
-                      ? "border-green-500"
+                      ? 'border-green-500'
                       : member.valid === false
-                      ? "border-red-500"
-                      : ""
+                      ? 'border-red-500'
+                      : ''
                   }`}
                 />
                 <button
@@ -183,5 +196,5 @@ export function AddGroupModal() {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

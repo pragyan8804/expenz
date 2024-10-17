@@ -7,6 +7,7 @@ import transactionRoutes from './routes/transaction';
 import groupRoutes from './routes/group';
 import groupTransactionRoutes from './routes/grouptransaction';
 import checkUsernameRoutes from './routes/checkusername';
+import simplifyDebtRoutes from './routes/simplifydebts';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/group-transactions', groupTransactionRoutes);
 app.use('/api/check-username', checkUsernameRoutes);
+app.use('/api/simplify-debts', simplifyDebtRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || '';

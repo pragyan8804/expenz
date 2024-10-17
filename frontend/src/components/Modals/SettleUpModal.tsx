@@ -23,6 +23,8 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
   const [members, setMembers] = useState<{ _id: string; username: string }[]>(
     []
   )
+  const [simplifySuccess, setSimplifySuccess] = useState<boolean | null>(null)
+  const [simplifyMessage, setSimplifyMessage] = useState<string>('')
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
@@ -55,6 +57,29 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
       window.location.reload()
     } catch (error) {
       console.error('Error settling up:', error)
+    }
+  }
+
+  const handleSimplifyDebts = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/simplify-debts`,
+        {
+          groupId,
+        }
+      )
+
+      if (response.data.success) {
+        setSimplifySuccess(true)
+        setSimplifyMessage(response.data.message)
+      } else {
+        setSimplifySuccess(false)
+        setSimplifyMessage(response.data.message)
+      }
+    } catch (error) {
+      console.error('Error simplifying debts:', error)
+      setSimplifySuccess(false)
+      setSimplifyMessage('Failed to simplify debts.')
     }
   }
 
@@ -121,9 +146,22 @@ export const SettleUpModal = ({ groupId }: { groupId: string }) => {
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between">
             <Button onClick={handleSettleUp}>Settle Up</Button>
+            <Button variant="outline" onClick={handleSimplifyDebts}>
+              Simplify Debts
+            </Button>
           </div>
+
+          {simplifyMessage && (
+            <div
+              className={`mt-4 ${
+                simplifySuccess ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              {simplifyMessage}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -22,6 +22,10 @@ app.use('/api/group-transactions', groupTransactionRoutes);
 app.use('/api/check-username', checkUsernameRoutes);
 app.use('/api/simplify-debts', simplifyDebtRoutes);
 
+app.get('/', (req, res) => {
+    res.send('Hello from the backend!')
+})
+
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || '';
 

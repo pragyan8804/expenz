@@ -48,7 +48,7 @@ router.post('/create', async (req: any, res: any) => {
 // });
 
 //Get the groups of that user on the split page
-router.get('/', async (req: any, res) => {
+router.get('/', async (req: any, res:any) => {
     try {
         const { userId } = req.query; // Get the userId from query parameters or you can use req.body for POST
 
@@ -71,7 +71,7 @@ router.get('/', async (req: any, res) => {
 });
 
 // Get group by id, for the group pages
-router.get('/:groupId', async (req, res) => {
+router.get('/:groupId', async (req:any, res:any) => {
     try {
         const { groupId } = req.params;
 

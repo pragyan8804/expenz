@@ -22,7 +22,7 @@ app.use('/api/group-transactions', groupTransactionRoutes);
 app.use('/api/check-username', checkUsernameRoutes);
 app.use('/api/simplify-debts', simplifyDebtRoutes);
 
-app.get('/', (req, res) => {
+app.get('/', (req:any, res:any) => {
     res.send('Hello from the backend!')
 })
 

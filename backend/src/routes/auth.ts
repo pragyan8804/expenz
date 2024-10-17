@@ -69,7 +69,7 @@ router.get("/users/:userId", async (req: Request, res: Response): Promise<void> 
 });
 
 //Get user ids from usernames (used in group creation)
-router.post('/users/ids', async (req: any, res: any) => {
+router.post('/users/ids', async (req: Request, res: Response) => {
     const { usernames } = req.body;
 
     try {

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import Group from '../models/Groups.model';
 import GroupTransaction from '../models/GroupTransactions.model';
 import mongoose from "mongoose";
@@ -6,13 +6,13 @@ import mongoose from "mongoose";
 const router = express.Router();
 
 //Add a transaction to a group
-router.post('/add', async (req: any, res: any) => {
+router.post('/add', async (req: Request, res: Response) => {
     try {
         const { amount, description, paidBy, splitBetween, groupId } = req.body;
         
         // Make sure groupId is defined and valid
         if (!mongoose.Types.ObjectId.isValid(groupId)) {
-            return res.status(400).json({ message: 'Invalid groupId' });
+            res.status(400).json({ message: 'Invalid groupId' });
         }
 
         // Convert groupId to ObjectId explicitly

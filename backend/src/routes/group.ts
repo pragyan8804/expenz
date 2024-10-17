@@ -76,8 +76,8 @@ router.get('/:groupId', async (req:any, res:any) => {
         const { groupId } = req.params;
 
         // Making sure groupId is defined and valid
-        if (!groupId || !mongoose.Types.ObjectId.isValid(groupId)) {
-            res.status(400).json({ message: 'Group ID is required' });
+        if (!groupId || !mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ message: 'Invalid Group ID' });
         }
 
         const group = await Group.findById(groupId)
@@ -98,7 +98,7 @@ router.get('/:groupId', async (req:any, res:any) => {
             });
 
         if (!group) {
-            res.status(404).json({ message: 'Group not found' });
+            return res.status(404).json({ message: 'Group not found' });
         } 
 
         res.status(200).json(group);

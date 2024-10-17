@@ -49,7 +49,6 @@ router.get("/:userId", async (req: any, res: any) => {
   }
 });
 
-//NOT IMPLEMENTED ON FRONTEND YET
 // Route to edit a transaction
 router.put(
   "/:id",
@@ -65,7 +64,7 @@ router.put(
       );
 
       if (!updatedTransaction) {
-        res.status(404).json({ message: "Transaction not found" });
+        return res.status(404).json({ message: "Transaction not found" });
       }
 
       res.status(200).json({
@@ -89,7 +88,7 @@ router.delete("/:id", async (req: any, res: any) => {
     const deletedTransaction = await Transaction.findByIdAndDelete(id);
 
     if (!deletedTransaction) {
-      res.status(404).json({ message: "Transaction not found" });
+      return res.status(404).json({ message: "Transaction not found" });
     }
 
     res.status(200).json({ message: "Transaction deleted successfully" });
@@ -106,10 +105,8 @@ router.get("/totals/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
-    // Convert userId to ObjectId for aggregation queries
     const objectUserId = new mongoose.Types.ObjectId(userId);
 
-    // Get the total expenses, income, and investments for the user
     const [totalExpenses, totalIncome, totalInvestments] = await Promise.all([
       Transaction.aggregate([
         { $match: { userId: objectUserId, category: "Expense" } },
@@ -125,14 +122,13 @@ router.get("/totals/:userId", async (req: any, res: any) => {
       ]),
     ]);
 
-    // Format the response
     res.status(200).json({
       totalExpenses: totalExpenses[0]?.totalAmount || 0,
       totalIncome: totalIncome[0]?.totalAmount || 0,
       totalInvestments: totalInvestments[0]?.totalAmount || 0,
     });
   } catch (error) {
-    console.error("Error:", error); // Log error for debugging
+    console.error("Error:", error);
     res.status(500).json({ message: "Error calculating totals", error: (error as Error).message });
   }
 });
@@ -142,16 +138,13 @@ router.get("/expenses/distribution/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
-    // Convert userId to ObjectId
     const objectUserId = new mongoose.Types.ObjectId(userId);
 
-    // Aggregate expenses by subCategory and sum the amounts
     const expenseDistribution = await Transaction.aggregate([
       { $match: { userId: objectUserId, category: "Expense" } },
       { $group: { _id: "$subCategory", totalAmount: { $sum: "$amount" } } }
     ]);
 
-    // Respond with the grouped data
     res.status(200).json(expenseDistribution);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving expense distribution", error: (error as Error).message });
@@ -163,20 +156,18 @@ router.get("/totals/monthly/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
-    // Convert userId to ObjectId for aggregation queries
     const objectUserId = new mongoose.Types.ObjectId(userId);
 
-    // Aggregate income and expenses by month for the user
     const monthlyData = await Transaction.aggregate([
-      { $match: { userId: objectUserId } }, // Filter by userId
+      { $match: { userId: objectUserId } },
       {
         $group: {
           _id: {
-            month: { $month: "$date" },    // Group by month
-            year: { $year: "$date" },      // Also group by year to avoid issues across different years
-            category: "$category"          // Group by category (Income or Expense)
+            month: { $month: "$date" },
+            year: { $year: "$date" },
+            category: "$category"
           },
-          totalAmount: { $sum: "$amount" } // Sum amounts for each category
+          totalAmount: { $sum: "$amount" }
         }
       },
       {
@@ -197,7 +188,7 @@ router.get("/totals/monthly/:userId", async (req: any, res: any) => {
           }
         }
       },
-      { $sort: { "_id.year": 1, "_id.month": 1 } }, // Sort by year and month
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
       {
         $project: {
           month: "$_id.month",

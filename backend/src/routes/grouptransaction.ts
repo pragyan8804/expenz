@@ -11,7 +11,7 @@ router.post('/add', async (req: any, res: any) => {
         const { amount, description, paidBy, splitBetween, groupId } = req.body;
         
         // Make sure groupId is defined and valid
-        if (!mongoose.Types.ObjectId.isValid(groupId)) {
+        if (!mongoose.isValidObjectId(groupId)) {
             res.status(400).json({ message: 'Invalid groupId' });
         }
 
@@ -32,14 +32,17 @@ router.post('/add', async (req: any, res: any) => {
             $push: { groupTransactions: newTransaction._id }
         });
 
-        // // Logic to split the expense between members and update "owes"
+        // Logic to split the expense between members and update "owes"
         const perPersonAmount = amount / splitBetween.length;
         const group = await Group.findById(groupId);
 
         splitBetween.forEach((member: any) => {
             if(member !== paidBy) {
                 if (!group) return;
-                const oweEntry = group.owes.find(o => o.from?.equals(member) && o.to?.equals(paidBy)); 
+                const oweEntry = group.owes.find(o => 
+                    o.from?.toString() === member.toString() && 
+                    o.to?.toString() === paidBy.toString()
+                );
 
                 if(oweEntry) {
                     oweEntry.amount += perPersonAmount;
@@ -69,8 +72,8 @@ router.post('/settle-up', async (req: any, res: any) => {
     try {
         const { amount, paidBy, paidTo, groupId } = req.body;
 
-        //group id shjould be valid
-        if (!mongoose.Types.ObjectId.isValid(groupId)) {
+        //group id should be valid
+        if (!mongoose.isValidObjectId(groupId)) {
             return res.status(400).json({ message: 'Invalid groupId' });
         }
 
@@ -80,8 +83,10 @@ router.post('/settle-up', async (req: any, res: any) => {
         }
         
         //find owe entry between paidBy user and paidTo user
-
-        const oweEntry = group.owes.find(o => o.from?.equals(paidBy) && o.to?.equals(paidTo));
+        const oweEntry = group.owes.find(o => 
+            o.from?.toString() === paidBy.toString() && 
+            o.to?.toString() === paidTo.toString()
+        );
 
         if (!oweEntry) {
             return res.status(404).json({ message: 'Owe entry not found between these two' });
@@ -90,12 +95,7 @@ router.post('/settle-up', async (req: any, res: any) => {
         //subtract
         oweEntry.amount -= amount;
 
-        //if  owe entry is 0, remove it
-        // if (oweEntry.amount <= 0) {
-        //     group.owes = group.owes.filter(
-        //         (owe) => !(owe.from?.equals(paidBy) && owe.to?.equals(paidTo))
-        //     );
-        // }
+        //if owe entry is 0, remove it
         if (oweEntry.amount <= 0) {
             const index = group.owes.indexOf(oweEntry);
             if (index > -1) {

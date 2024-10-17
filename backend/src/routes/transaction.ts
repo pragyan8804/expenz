@@ -1,30 +1,13 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import Transaction from "../models/Transactions.model";
 import mongoose from "mongoose";
 
 const router = express.Router();
 
-// Define types for the request bodies
-interface AddTransactionRequestBody {
-  userId: string;
-  amount: number;
-  category: string;
-  subCategory?: string;
-  date: Date;
-  name: string;
-  notes?: string;
-}
-
-// Define types for params (if applicable)
-interface ParamsWithId {
-  id: string;
-  userId: string;
-}
-
 // Route to add a new transaction
 router.post(
   "/add",
-  async (req: Request<{}, {}, AddTransactionRequestBody>, res: Response) => {
+  async (req: any, res: any) => {
     const { userId, amount, category, subCategory, date, name, notes } = req.body;
 
     try {
@@ -52,7 +35,7 @@ router.post(
 );
 
 // Route to get all transactions for a specific user
-router.get("/:userId", async (req: Request<ParamsWithId>, res: Response) => {
+router.get("/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
@@ -70,7 +53,7 @@ router.get("/:userId", async (req: Request<ParamsWithId>, res: Response) => {
 // Route to edit a transaction
 router.put(
   "/:id",
-  async (req: Request<ParamsWithId, {}, AddTransactionRequestBody>, res: Response) => {
+  async (req: any, res: any) => {
     const { id } = req.params;
     const { amount, category, subCategory, date, name, notes } = req.body;
 
@@ -99,7 +82,7 @@ router.put(
 );
 
 // Route to delete a transaction
-router.delete("/:id", async (req: Request<ParamsWithId>, res: Response) => {
+router.delete("/:id", async (req: any, res: any) => {
   const { id } = req.params;
 
   try {
@@ -119,7 +102,7 @@ router.delete("/:id", async (req: Request<ParamsWithId>, res: Response) => {
 });
 
 // Route to get total amounts for expenses, income, and investments for a specific user
-router.get("/totals/:userId", async (req: Request, res: Response) => {
+router.get("/totals/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
@@ -155,7 +138,7 @@ router.get("/totals/:userId", async (req: Request, res: Response) => {
 });
 
 // Route to get expense distribution by subCategory for a specific user
-router.get("/expenses/distribution/:userId", async (req: Request, res: Response) => {
+router.get("/expenses/distribution/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
@@ -176,7 +159,7 @@ router.get("/expenses/distribution/:userId", async (req: Request, res: Response)
 });
 
 // Route to get income and expenses by month for a specific user
-router.get("/totals/monthly/:userId", async (req: Request, res: Response) => {
+router.get("/totals/monthly/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {

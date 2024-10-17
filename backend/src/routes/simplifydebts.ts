@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import simplifyDebts from '../controllers/simplifydebts'; 
 
 const router = express.Router();
 
 //simplify debts
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: any, res: any) => {
     const { groupId } = req.body; 
     const result = await simplifyDebts(groupId);
 

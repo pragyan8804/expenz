@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import User from '../models/User.model';
 
 const router = express.Router();
 
 //if the username exists
-router.get('/:username', async (req: Request, res: Response) => {
+router.get('/:username', async (req: any, res: any) => {
   try {
     const user = await User.findOne({ username: req.params.username });
     if (user) {

@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express"
+import express from "express"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import User from "../models/User.model"
@@ -6,7 +6,7 @@ import User from "../models/User.model"
 const router = express.Router();
 
 //Signup
-router.post("/signup", async (req: Request, res: Response): Promise<void> => {
+router.post("/signup", async (req: any, res: any): Promise<void> => {
     const { name, username, password } = req.body;
 
     try {
@@ -28,7 +28,7 @@ router.post("/signup", async (req: Request, res: Response): Promise<void> => {
 });
 
 //Login
-router.post("/login", async (req: Request, res: Response): Promise<void> => {
+router.post("/login", async (req: any, res: any) => {
     const { username, password } = req.body;
 
     try {
@@ -52,7 +52,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
 });
 
 // Get user details by userId
-router.get("/users/:userId", async (req: Request, res: Response): Promise<void> => {
+router.get("/users/:userId", async (req: any, res: any) => {
   const { userId } = req.params;
 
   try {
@@ -69,7 +69,7 @@ router.get("/users/:userId", async (req: Request, res: Response): Promise<void> 
 });
 
 //Get user ids from usernames (used in group creation)
-router.post('/users/ids', async (req: Request, res: Response) => {
+router.post('/users/ids', async (req: any, res: any) => {
     const { usernames } = req.body;
 
     try {

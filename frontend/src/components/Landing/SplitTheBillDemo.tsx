@@ -145,7 +145,7 @@ export default function SplitTheBillDemo() {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-semibold mb-6 text-center text-primary"
       >
-        Split the Bill - Simplified
+        Split the Bill - Playground
       </motion.h1>
       <motion.p
         initial={{ opacity: 0 }}

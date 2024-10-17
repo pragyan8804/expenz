@@ -1,0 +1,66 @@
+export const categories = {
+    Expense: {
+      Essentials: [
+        'Food & Dining',
+        'Groceries',
+        'Healthcare',
+        'Education',
+        'Taxes',
+        'Bills & Fees',
+        'Housing',
+        'Utilities',
+        'Insurance',
+        'Debt Payments',
+      ],
+      Lifestyle: [
+        'Transportation',
+        'Entertainment',
+        'Shopping',
+        'Personal Care',
+        'Travel',
+        'Gifts & Donations',
+        'Subscriptions',
+      ],
+      Miscellaneous: ['Miscellaneous'],
+    },
+    Income: {
+      'Primary Income': ['Salary', 'Business', 'Freelance'],
+      'Passive Income': [
+        'Investments',
+        'Rental Income',
+        'Dividends',
+        'Interest',
+        'Royalties',
+      ],
+      'Other Income': [
+        'Gifts Received',
+        'Tax Refunds',
+        'Government Benefits',
+        'Side Hustle',
+        'Commissions',
+        'Bonuses',
+      ],
+    },
+    Investment: {
+      'Traditional Investments': [
+        'Stocks',
+        'Bonds',
+        'Mutual Funds',
+        'ETFs',
+        'Real Estate',
+      ],
+      'Alternative Investments': [
+        'Cryptocurrency',
+        'Commodities',
+        'P2P Lending',
+        'Startups',
+        'Art & Collectibles',
+      ],
+      'Retirement & Savings': [
+        'Retirement Accounts',
+        'Savings Accounts',
+        'Certificates of Deposit',
+      ],
+      'Advanced Instruments': ['Forex', 'Options'],
+    },
+};

@@ -10,26 +10,17 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 text-left">
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://pragyan8804.vercel.app"
-            className="hover:text-gray-900"
-          >
-            About Me
-          </a>
-          <a
-            href="#features"
-            className="hover:text-gray-900"
-            onClick={(e) => {
-              e.preventDefault() // Prevent default anchor behavior
-              document
-                .getElementById('features')
-                ?.scrollIntoView({ behavior: 'smooth' }) // Smooth scroll to features section
-            }}
-          >
-            Features
-          </a>
+          <span className="text-sm">
+            Made by{' '}
+            <a
+              href="https://pragyan8804.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-600"
+            >
+              Pragyan
+            </a>
+          </span>
         </div>
 
         <a

@@ -30,6 +30,7 @@ import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import { useToast } from '@/hooks/use-toast'
+import { categories } from '@/lib/categories'
 
 export function AddTransactionModal() {
   const [name, setName] = useState('')
@@ -73,74 +74,6 @@ export function AddTransactionModal() {
     setTimeout(() => {
       dismiss()
     }, 2000)
-  }
-
-  // Categories with subcategories and group labels
-  const categories = {
-    Expense: {
-      Essentials: [
-        'Food & Dining',
-        'Groceries',
-        'Healthcare',
-        'Education',
-        'Taxes',
-        'Bills & Fees',
-        'Housing',
-        'Utilities',
-        'Insurance',
-        'Debt Payments',
-      ],
-      Lifestyle: [
-        'Transportation',
-        'Entertainment',
-        'Shopping',
-        'Personal Care',
-        'Travel',
-        'Gifts & Donations',
-        'Subscriptions',
-      ],
-      Miscellaneous: ['Miscellaneous'],
-    },
-    Income: {
-      'Primary Income': ['Salary', 'Business', 'Freelance'],
-      'Passive Income': [
-        'Investments',
-        'Rental Income',
-        'Dividends',
-        'Interest',
-        'Royalties',
-      ],
-      'Other Income': [
-        'Gifts Received',
-        'Tax Refunds',
-        'Government Benefits',
-        'Side Hustle',
-        'Commissions',
-        'Bonuses',
-      ],
-    },
-    Investment: {
-      'Traditional Investments': [
-        'Stocks',
-        'Bonds',
-        'Mutual Funds',
-        'ETFs',
-        'Real Estate',
-      ],
-      'Alternative Investments': [
-        'Cryptocurrency',
-        'Commodities',
-        'P2P Lending',
-        'Startups',
-        'Art & Collectibles',
-      ],
-      'Retirement & Savings': [
-        'Retirement Accounts',
-        'Savings Accounts',
-        'Certificates of Deposit',
-      ],
-      'Advanced Instruments': ['Forex', 'Options'],
-    },
   }
 
   // Update subcategories when category changes

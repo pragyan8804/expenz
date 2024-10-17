@@ -1,5 +1,5 @@
 import mongoose, { ObjectId } from 'mongoose';
-import Group from '../models/Groups.model'; // Import the Group model
+import Group from '../models/Groups.model';
 
 
 // Function to simplify debts

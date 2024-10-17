@@ -3,6 +3,7 @@ import { FaqAccordion } from '@/components/Landing/FaqAccordion'
 import Features from '@/components/Landing/Features'
 import { Footer } from '@/components/Landing/Footer'
 import { HeroSection } from '@/components/Landing/HeroSection'
+import SplitTheBillDemo from '@/components/Landing/SplitTheBillDemo'
 
 export function Landing() {
   return (
@@ -17,6 +18,8 @@ export function Landing() {
         </div>
 
         <ChartsDemo />
+
+        <SplitTheBillDemo />
 
         <FaqAccordion />
 

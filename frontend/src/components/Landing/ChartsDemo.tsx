@@ -77,7 +77,7 @@ export function ChartsDemo() {
 
   return (
     <>
-      <div className="mb-6 px-16 mx-auto">
+      <div className="mb-6 px-16 mx-auto text-center">
         <h1 className="text-3xl font-semibold mb-2">Financial Overview</h1>
         <p className="text-gray-600">
           This section provides insights into your financial status through

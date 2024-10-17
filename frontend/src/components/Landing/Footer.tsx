@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="w-full bg-gradient-to-r from-pink-200 via-pink-100 to-pink-200 text-gray-700 py-4 rounded-xl">
       <div className="container mx-auto flex flex-col md:flex-row justify-between md:items-center gap-6 px-6">
         <div className="flex items-center space-x-3">
-          <img src="/public/logo.png" alt="Expenz Logo" className="w-10 h-10" />
+          <img src="/logo.png" alt="Expenz Logo" className="w-10 h-10" />
           <span className="text-xl font-semibold">Expenz</span>
         </div>
 
